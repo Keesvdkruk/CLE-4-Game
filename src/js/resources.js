@@ -1,5 +1,5 @@
-import { ImageSource, Loader } from 'excalibur'
 
+import { ImageSource, Resource, Loader } from 'excalibur'
 export const Resources = {
     Idle: new ImageSource('/images/Idle.png'),
     Walk: new ImageSource('/images/Walk.png'),

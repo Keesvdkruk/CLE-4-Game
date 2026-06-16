@@ -6,6 +6,8 @@ import { Ground } from './ground.js'
 import { Platform } from './platform.js'
 import { Poster } from './poster.js'
 import { CameraEnemy } from './camera.js'
+import { StartScene } from './scenes/startscene.js'
+import { LevelOne } from './scenes/levelone.js'
 
 export class Game extends Engine {
 
@@ -20,53 +22,15 @@ export class Game extends Engine {
                 gravity: new Vector(0, 2000) 
             }
          })
-
-        this.start(ResourceLoader).then(() => {
-            this.toggleDebug() 
-            this.startGame()
-        })
+         this.start(ResourceLoader).then(() => this.startGame())
     }
 
     startGame() {
-        console.log("start de game!")
-        
-        const ground = new Ground()
-        this.add(ground)
-
-        const leftWall = new Actor({
-            x: -25,          
-            y: 360,          
-            width: 50,
-            height: 720,     
-            color: Color.Transparent, 
-            collisionType: CollisionType.Fixed 
-        })
-        this.add(leftWall)
-
-        this.add(new Poster(500, 620))
-        this.add(new Poster(1200, 620))
-        this.add(new Poster(2500, 620))
-        this.add(new Poster(1400, 220))
-
-        this.add(new Platform(600, 550, 200, 30))
-        this.add(new Platform(1000, 450, 200, 30))
-        this.add(new Platform(1400, 300, 300, 30))
-
-        this.add(new CameraEnemy(700, 660))
-        
-        this.add(new CameraEnemy(1300, 260))
-
-        const player = new Player()
-        this.add(player)
-
-        this.currentScene.camera.strategy.lockToActorAxis(player, Axis.X)
-        this.currentScene.camera.strategy.limitCameraBounds(new BoundingBox({
-            left: 0,
-            top: 0,
-            right: 4000, 
-            bottom: 720
-        }))
-    }
+    console.log("start de game!")
+    this.addScene("start", new StartScene());
+    this.addScene("levelone", new LevelOne());
+    this.goToScene("start")
+}
 }
 
 new Game()
