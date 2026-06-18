@@ -54,14 +54,14 @@ export class Player extends Actor {
     onPreUpdate(engine) {
         this.vel.x = 0 
 
-        if (engine.input.keyboard.isHeld(Keys.Left)) {
+        if (engine.input.keyboard.isHeld(Keys.Left) || engine.input.keyboard.isHeld(Keys.A)) {
             this.vel.x = -300
             this.facingLeft = true
             this.graphics.use("walk")
             
-        } else if (engine.input.keyboard.isHeld(Keys.Right)) {
+        } else if (engine.input.keyboard.isHeld(Keys.Right) || engine.input.keyboard.isHeld(Keys.D)) {
             this.vel.x = 300
-            this.facingLeft = CSSFontFeatureValuesRule
+            this.facingLeft = false
             this.graphics.use("walk")
             
         } else {
@@ -70,7 +70,7 @@ export class Player extends Actor {
             }
         }
 
-        if (engine.input.keyboard.wasPressed(Keys.Up) || engine.input.keyboard.wasPressed(Keys.Space)) {
+        if (engine.input.keyboard.wasPressed(Keys.Up) || engine.input.keyboard.wasPressed(Keys.Space) || engine.input.keyboard.wasPressed(Keys.W)) {
             if (this.onGround) {
                 this.vel.y = -850
                 this.onGround = false 
