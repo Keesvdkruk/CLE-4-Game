@@ -1,11 +1,7 @@
-import { Color, Scene, Label, Font, Actor, Rectangle } from "excalibur";
+import { Color, Scene, Label, Font, FontUnit, Actor, Rectangle } from "excalibur";
 import { Game } from "../game";
 
 export class StartScene extends Scene {
-    /**
-     * 
-     * @param {Game} engine 
-     */
     onInitialize(engine) {
         const overlay = new Actor({
             x: engine.drawWidth / 2,
@@ -20,14 +16,15 @@ export class StartScene extends Scene {
         }));
         this.add(overlay);
 
-
         const settingsLabel = new Label({
             color: Color.White,
-            x: engine.drawWidth / 2 - 160,
+            x: engine.drawWidth / 2 - 250, // Misschien iets meer naar links schuiven als het font breed is!
             y: engine.drawHeight / 4,
             text: "State of Venstra",
             font: new Font({
-                size: 75
+                family: 'MijnPixelFont', // HIER ROEPEN WE JE NIEUWE FONT AAN!
+                size: 75,
+                unit: FontUnit.Px // Zorgt dat Excalibur weet dat we pixels bedoelen
             })
         });
         this.add(settingsLabel);
@@ -36,17 +33,25 @@ export class StartScene extends Scene {
             color: Color.White,
             x: engine.drawWidth / 2 - 100,
             y: engine.drawHeight / 2 + 50,
-            text: "level 1",
+            text: "Level 1",
             font: new Font({
-                size: 75
+                family: 'MijnPixelFont', // EN HIER OOK!
+                size: 50, // Pixel fonts zijn vaak wat groter, dus speel met deze grootte
+                unit: FontUnit.Px
             })
         });
         this.add(levelOneLabel);
+
+        // Zorg dat de muis een handje wordt als je eroverheen zweeft
+        levelOneLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
+        levelOneLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
 
         levelOneLabel.on("pointerdown", () => this.handleClick());
     }
 
     handleClick() {
+        // Reset de muiscursor voordat we naar het volgende level gaan
+        this.engine.canvas.style.cursor = 'default';
         this.engine.goToScene("levelone");
     }
 }
