@@ -12,8 +12,8 @@ export const Resources = {
     Bg3: new ImageSource('/images/3.png'),
     Bg4: new ImageSource('/images/4.png'),
 
-    // NIEUW: Laad het lettertype in. 
-    // Parameter 1: het pad. Parameter 2: de naam die we het geven.
+    Platform: new ImageSource('/images/Platform.png'),
+
     PixelFont: new FontSource('/fonts/pixel.ttf', 'MijnPixelFont') 
 }
 

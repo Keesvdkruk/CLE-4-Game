@@ -1,14 +1,19 @@
-import { Actor, CollisionType, Color } from "excalibur"
+import { Actor, CollisionType, Color, Vector } from "excalibur"
+import { Resources } from "./resources";
 
 export class Platform extends Actor {
-    constructor(x, y, breedte, hoogte) {
+    constructor(x, y, width = 200, height = 30) {
         super({
-            x: x,
-            y: y,
-            width: breedte,
-            height: hoogte,
-            color: Color.Orange,
-            collisionType: CollisionType.Fixed 
-        })
+            pos: new Vector(x, y),
+            width: Resources.Platform.width,
+            height: Resources.Platform.height,
+            anchor: new Vector(0, 0)
+        });
+
+        this.graphics.use(Resources.Platform.toSprite());
+    }
+
+    onInitialize(engine) {
+        this.body.collisionType = CollisionType.Fixed
     }
 }
