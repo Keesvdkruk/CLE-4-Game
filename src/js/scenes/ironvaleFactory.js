@@ -1,5 +1,5 @@
 import { Actor, Color, CollisionType, Axis, BoundingBox, Scene } from "excalibur"
-import { CameraEnemy } from "../camera"
+import { Drone } from "../drone"
 import { Ground } from "../ground"
 import { Platform } from "../platform"
 import { Player } from "../player"
