@@ -9,7 +9,7 @@ import { CameraEnemy } from './camera.js'
 import { StartScene } from './scenes/startscene.js'
 import { LevelOne } from './scenes/levelone.js'
 import { Ironvale } from './scenes/ironvale.js'
-
+import { IronvaleFactory } from './scenes/ironvaleFactory.js'
 
 export class Game extends Engine {
 
@@ -32,6 +32,7 @@ export class Game extends Engine {
         this.addScene("start", new StartScene());
         this.addScene("levelone", new LevelOne());
         this.addScene("ironvale", new Ironvale());
+        this.addScene("ironvalefactory", new IronvaleFactory());
         this.goToScene("start")
     }
 }

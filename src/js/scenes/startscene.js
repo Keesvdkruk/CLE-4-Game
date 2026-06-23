@@ -45,7 +45,7 @@ export class StartScene extends Scene {
         const ironvaleLabel = new Label({
             color: Color.White,
             x: engine.drawWidth / 2 - 100,
-            y: engine.drawHeight / 2 + 150,
+            y: engine.drawHeight / 2 + 100,
             text: "Ironvale",
             font: new Font({
                 family: 'MijnPixelFont', // EN HIER OOK!
@@ -55,10 +55,23 @@ export class StartScene extends Scene {
         });
         this.add(ironvaleLabel);
 
+         const ironvaleFactoryLabel = new Label({
+            color: Color.White,
+            x: engine.drawWidth / 2 - 100,
+            y: engine.drawHeight / 2 + 150,
+            text: "Ironvale Factory",
+            font: new Font({
+                family: 'MijnPixelFont', // EN HIER OOK!
+                size: 50, // Pixel fonts zijn vaak wat groter, dus speel met deze grootte
+                unit: FontUnit.Px
+            })
+        });
+        this.add(ironvaleFactoryLabel);
+
         const eastwatchLabel = new Label({
             color: Color.White,
             x: engine.drawWidth / 2 - 100,
-            y: engine.drawHeight / 2 + 250,
+            y: engine.drawHeight / 2 + 200,
             text: "Eastwatch",
             font: new Font({
                 family: 'MijnPixelFont', // EN HIER OOK!
@@ -75,12 +88,17 @@ export class StartScene extends Scene {
         ironvaleLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
         ironvaleLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
 
+        ironvaleFactoryLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
+        ironvaleFactoryLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+
         eastwatchLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
         eastwatchLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
 
         levelOneLabel.on("pointerdown", () => this.handleClick("levelone"));
         ironvaleLabel.on("pointerdown", () => this.handleClick("ironvale"));
         eastwatchLabel.on("pointerdown", () => this.handleClick("eastwatch"));
+        ironvaleFactoryLabel.on("pointerdown", () => this.handleClick("ironvalefactory"));
+
     }
 
     handleClick(scene) {

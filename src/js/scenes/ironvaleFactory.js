@@ -6,20 +6,16 @@ import { Player } from "../player"
 import { Poster } from "../poster"
 import { Background } from "../background"
 import { Resources } from "../resources"
-import { ironvalePoster } from "../ironvalePoster"
-import { ironvaleGround } from "../ironvaleGround"
-import { ironvalePlatform } from "../ironvalePlatform"
 
-export class Ironvale extends Scene {
+export class IronvaleFactory extends Scene {
 
     onInitialize(engine) {
-        // Moving Background
         this.add(new Background(Resources.Bg1, 0.05, -104))
-        this.add(new Background(Resources.Bg2, 0.2, -103))
-        this.add(new Background(Resources.Bg3, 0.4, -102))
-        this.add(new Background(Resources.Bg4, 0.6, -101))
+        this.add(new Background(Resources.Factory2, 0.2, -103))
+        this.add(new Background(Resources.Factory3, 0.4, -102))
+        this.add(new Background(Resources.Factory4, 0.6, -101))
 
-        const ground = new ironvaleGround()
+        const ground = new Ground()
         this.add(ground)
 
         const leftWall = new Actor({
@@ -32,14 +28,10 @@ export class Ironvale extends Scene {
         })
         this.add(leftWall)
 
-        this.add(new ironvalePoster(400, 605))
-        this.add(new ironvalePoster(1200, 605))
-        this.add(new ironvalePoster(2500, 605))
-        this.add(new ironvalePoster(1400, 210))
-
-        this.add(new ironvalePlatform(600, 550, 350, 30))
-        this.add(new ironvalePlatform(1000, 440, 350, 30))
-        this.add(new ironvalePlatform(1200, 280, 450, 30))
+        this.add(new Poster(500, 620))
+        this.add(new Poster(1200, 620))
+        this.add(new Poster(2500, 620))
+        this.add(new Poster(1400, 220))
 
         this.add(new CameraEnemy(700, 660))
         this.add(new CameraEnemy(1300, 260))
@@ -47,7 +39,6 @@ export class Ironvale extends Scene {
         const player = new Player()
         this.add(player)
 
-        // Camera
         this.camera.strategy.lockToActorAxis(player, Axis.X)
         this.camera.strategy.limitCameraBounds(new BoundingBox({
             left: 0,
