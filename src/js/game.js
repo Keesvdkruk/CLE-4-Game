@@ -6,7 +6,7 @@ import { Ground } from './ground.js'
 import { Platform } from './platform.js'
 import { Poster } from './poster.js'
 import { StartScene } from './scenes/startscene.js'
-import { LevelOne } from './scenes/levelone.js'
+import { Southreach } from './scenes/Southreach.js'
 import { Ironvale } from './scenes/ironvale.js'
 import { Eastwatch } from './scenes/Eastwatch.js'
 
@@ -30,7 +30,7 @@ export class Game extends Engine {
     startGame() {
         console.log("start de game!")
         this.addScene("start", new StartScene());
-        this.addScene("levelone", new LevelOne());
+        this.addScene("southreach", new Southreach());
         this.addScene("ironvale", new Ironvale());
         this.addScene("eastwatch", new Eastwatch());
 

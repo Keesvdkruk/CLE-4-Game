@@ -11,7 +11,9 @@ export const Resources = {
     TraderIdle: new ImageSource('/Trader_1/Idle.png'),
     TraderDialogue: new ImageSource('/Trader_1/Dialogue.png'),
     PropagandaPoster: new ImageSource('/images/propaganda_poster.png'),
-    
+    Npc1Idle1: new ImageSource('/Homeless_1/Idle.png'),
+    Npc1Idle2: new ImageSource('/Homeless_1/Idle_2.png'),
+
     Bg1: new ImageSource('/images/1.png'), 
     Bg2: new ImageSource('/images/2.png'),
     Bg3: new ImageSource('/images/3.png'),

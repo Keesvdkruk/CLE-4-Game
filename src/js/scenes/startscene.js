@@ -18,29 +18,29 @@ export class StartScene extends Scene {
 
         const settingsLabel = new Label({
             color: Color.White,
-            x: engine.drawWidth / 2 - 250, // Misschien iets meer naar links schuiven als het font breed is!
+            x: engine.drawWidth / 2 - 250, 
             y: engine.drawHeight / 4,
             text: "State of Vestra",
             font: new Font({
-                family: 'MijnPixelFont', // HIER ROEPEN WE JE NIEUWE FONT AAN!
+                family: 'MijnPixelFont', 
                 size: 75,
-                unit: FontUnit.Px // Zorgt dat Excalibur weet dat we pixels bedoelen
+                unit: FontUnit.Px 
             })
         });
         this.add(settingsLabel);
 
-        const levelOneLabel = new Label({
+        const southreachLabel = new Label({
             color: Color.White,
             x: engine.drawWidth / 2 - 100,
             y: engine.drawHeight / 2 + 50,
-            text: "Level 1",
+            text: "Southreach",
             font: new Font({
-                family: 'MijnPixelFont', // EN HIER OOK!
-                size: 50, // Pixel fonts zijn vaak wat groter, dus speel met deze grootte
+                family: 'MijnPixelFont', 
+                size: 50, 
                 unit: FontUnit.Px
             })
         });
-        this.add(levelOneLabel);
+        this.add(southreachLabel);
 
         const ironvaleLabel = new Label({
             color: Color.White,
@@ -48,8 +48,8 @@ export class StartScene extends Scene {
             y: engine.drawHeight / 2 + 150,
             text: "Ironvale",
             font: new Font({
-                family: 'MijnPixelFont', // EN HIER OOK!
-                size: 50, // Pixel fonts zijn vaak wat groter, dus speel met deze grootte
+                family: 'MijnPixelFont', 
+                size: 50, 
                 unit: FontUnit.Px
             })
         });
@@ -61,16 +61,15 @@ export class StartScene extends Scene {
             y: engine.drawHeight / 2 + 250,
             text: "Eastwatch",
             font: new Font({
-                family: 'MijnPixelFont', // EN HIER OOK!
-                size: 50, // Pixel fonts zijn vaak wat groter, dus speel met deze grootte
+                family: 'MijnPixelFont', 
+                size: 50, 
                 unit: FontUnit.Px
             })
         });
         this.add(eastwatchLabel);
 
-        // Zorg dat de muis een handje wordt als je eroverheen zweeft
-        levelOneLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
-        levelOneLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+        southreachLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
+        southreachLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
 
         ironvaleLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
         ironvaleLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
@@ -78,13 +77,12 @@ export class StartScene extends Scene {
         eastwatchLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
         eastwatchLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
 
-        levelOneLabel.on("pointerdown", () => this.handleClick("levelone"));
+        southreachLabel.on("pointerdown", () => this.handleClick("southreach"));
         ironvaleLabel.on("pointerdown", () => this.handleClick("ironvale"));
         eastwatchLabel.on("pointerdown", () => this.handleClick("eastwatch"));
     }
 
     handleClick(scene) {
-        // Reset de muiscursor voordat we naar het volgende level gaan
         this.engine.canvas.style.cursor = 'default';
         this.engine.goToScene(scene);
 

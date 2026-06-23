@@ -31,17 +31,29 @@ export class ChoiceNpc extends Actor {
         this.engine = engine
 
         const idleSheet = SpriteSheet.fromImageSource({
-            image: Resources.TraderIdle,
+            image: Resources.Npc1Idle1,
             grid: { rows: 1, columns: 6, spriteWidth: 128, spriteHeight: 128 }
         })
 
-        const idleAnim = Animation.fromSpriteSheet(idleSheet, [0, 1, 2, 3, 4, 5], 120)
-        idleAnim.scale = new Vector(1.2, 1.2)
-        this.graphics.use(idleAnim)
+        const idleSheet2 = SpriteSheet.fromImageSource({
+            image: Resources.Npc1Idle2,
+            grid: { rows: 1, columns: 11, spriteWidth: 128, spriteHeight: 128 }
+        })
+
+        const idleAnim1 = Animation.fromSpriteSheet(idleSheet, [0, 1, 2, 3, 4, 5], 120)
+        idleAnim1.scale = new Vector(1.2, 1.2)
+
+        const idleAnim2 = Animation.fromSpriteSheet(idleSheet, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 120)
+        idleAnim2.scale = new Vector(1.2, 1.2)
+        this.graphics.add("idle2", idleAnim2)
+
+        this.graphics.add("idle1", idleAnim1)
+        this.graphics.use("idle1")
 
         this.on('collisionstart', (evt) => {
             if (evt.other.owner === this.player) {
                 this.isPlayerNear = true
+                this.graphics.use("idle2")
                 
                 if (this.dialogueState === 0) {
                     this.dialogueState = 1
@@ -53,6 +65,7 @@ export class ChoiceNpc extends Actor {
         // --- SPELER LOOPT WEG ---
         this.on('collisionend', (evt) => {
             if (evt.other.owner === this.player) {
+                this.graphics.use("idle1")
                 this.isPlayerNear = false
                 this.dialogueState = 0
                 this.hideDialogue()

@@ -10,7 +10,7 @@ import { Background } from "../background"
 import { Resources } from "../resources"
 import { ChoiceNpc } from "../choicenpc"
 
-export class LevelOne extends Scene {
+export class Southreach extends Scene {
 
     onInitialize(engine) {
         this.engine = engine
