@@ -1,5 +1,5 @@
 import { Actor, Color, CollisionType, Axis, BoundingBox, Scene } from "excalibur"
-import { CameraEnemy } from "../camera"
+import { Drone } from "../drone"
 import { Ground } from "../ground"
 import { Platform } from "../platform"
 import { Player } from "../player"
@@ -29,8 +29,6 @@ export class Ironvale extends Scene {
         // Laag 4: Voorste machinerie (beweegt het snelst, maar nog steeds trager dan de speler)
         this.add(new Background(Resources.Bg4, 0.6, -101))
 
-
-        // --- DE REST VAN JE LEVEL ---
         const ground = new Ground()
         this.add(ground)
 
@@ -50,8 +48,8 @@ export class Ironvale extends Scene {
         this.add(new Poster(1400, 220))
 
 
-        this.add(new CameraEnemy(700, 660))
-        this.add(new CameraEnemy(1300, 260))
+        this.add(new Drone(700, 660))
+        this.add(new Drone(1300, 260))
 
         const player = new Player()
         this.add(player)

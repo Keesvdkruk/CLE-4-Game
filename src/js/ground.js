@@ -7,7 +7,7 @@ export class Ground extends Actor {
             y: 700,           
             width: 4000,
             height: 40,
-            color: Color.Green, 
+            color: Color.Black,
             collisionType: CollisionType.Fixed 
         })
         

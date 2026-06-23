@@ -1,16 +1,19 @@
 import { Actor, Color, CollisionType, Axis, BoundingBox, Scene } from "excalibur"
-import { CameraEnemy } from "../camera"
+import { Drone } from "../drone"
 import { Ground } from "../ground"
 import { Platform } from "../platform"
 import { Player } from "../player"
 import { Poster } from "../poster"
+import { Trader } from "../trader"
 // NIEUW: Importeer Background en Resources
 import { Background } from "../background"
 import { Resources } from "../resources"
+import { ChoiceNpc } from "../choicenpc"
 
 export class LevelOne extends Scene {
 
     onInitialize(engine) {
+        this.engine = engine
 
         // --- PARALLAX ACHTERGRONDEN ---
         // Volgorde is belangrijk: (Afbeelding, Snelheid, z-index)
@@ -18,19 +21,20 @@ export class LevelOne extends Scene {
         // Hoe lager de snelheid (bijv 0.1), hoe trager hij beweegt (ver weg).
         
         // Laag 1: De oranje lucht (beweegt bijna niet)
-        this.add(new Background(Resources.Bg1, 0.05, -104))
+        this.add(new Background(Resources.BgSouthreach, 0.05, -104))
         
         // Laag 2: Verste gebouwen
-        this.add(new Background(Resources.Bg2, 0.2, -103))
+        this.add(new Background(Resources.BgSouthreach2, 0.2, -103))
         
         // Laag 3: Middelste gebouwen
-        this.add(new Background(Resources.Bg3, 0.4, -102))
+        this.add(new Background(Resources.BgSouthreach3, 0.4, -102))
         
         // Laag 4: Voorste machinerie (beweegt het snelst, maar nog steeds trager dan de speler)
-        this.add(new Background(Resources.Bg4, 0.6, -101))
+        this.add(new Background(Resources.BgSouthreach4, 0.6, -101))
+
+        this.add(new Background(Resources.BgSouthreach5, 0.8, -100))
 
 
-        // --- DE REST VAN JE LEVEL ---
         const ground = new Ground()
         this.add(ground)
 
@@ -53,11 +57,20 @@ export class LevelOne extends Scene {
         this.add(new Platform(1000, 450, 200, 30))
         this.add(new Platform(1400, 300, 300, 30))
 
-        this.add(new CameraEnemy(700, 660))
-        this.add(new CameraEnemy(1300, 260))
-
         const player = new Player()
+        player.onKnockoutComplete = () => this.restartLevel()
         this.add(player)
+
+        const trader = new Trader(1000, 435)
+        trader.setPlayer(player)
+        this.add(trader)
+
+        const choiceNpc = new ChoiceNpc(600, 535)
+        choiceNpc.setPlayer(player)
+        this.add(choiceNpc)
+
+        this.add(new Drone(700, 630))
+        this.add(new Drone(1300, 260))
 
         this.camera.strategy.lockToActorAxis(player, Axis.X)
         this.camera.strategy.limitCameraBounds(new BoundingBox({
@@ -67,5 +80,10 @@ export class LevelOne extends Scene {
             bottom: 720
         }))
 
+    }
+
+    restartLevel() {
+        this.engine.addScene("levelone", new LevelOne())
+        this.engine.goToScene("levelone")
     }
 }
