@@ -83,7 +83,10 @@ export class Southreach extends Scene {
     }
 
     restartLevel() {
-        this.engine.addScene("levelone", new LevelOne())
-        this.engine.goToScene("levelone")
+        this.clear()
+        
+        this.camera.clearAllStrategies()
+        
+        this.onInitialize(this.engine)
     }
 }

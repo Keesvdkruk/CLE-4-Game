@@ -110,6 +110,9 @@ export class Player extends Actor {
 
     finishKnockout() {
         this.isKnockedOut = false
+        
+        this.hasBeenKnockedOutThisLevel = false 
+        
         this.knockoutStartTime = null
         this.knockoutIsHoldingFrame = false
         this.pos = new Vector(100, 500)
