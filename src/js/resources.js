@@ -12,6 +12,11 @@ export const Resources = {
     Bg3: new ImageSource('/images/3.png'),
     Bg4: new ImageSource('/images/4.png'),
 
+    Eastwatch1: new ImageSource('/images/Eastwatch1.png'),
+    Eastwatch2: new ImageSource('/images/Eastwatch2.png'),
+    Eastwatch3: new ImageSource('/images/Eastwatch3.png'),
+    Eastwatch4: new ImageSource('/images/Eastwatch4.png'),
+
     Platform: new ImageSource('/images/Platform.png'),
 
     PixelFont: new FontSource('/fonts/pixel.ttf', 'MijnPixelFont') 
