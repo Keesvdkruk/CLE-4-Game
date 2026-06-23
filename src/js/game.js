@@ -5,10 +5,10 @@ import { Player } from './player.js'
 import { Ground } from './ground.js'
 import { Platform } from './platform.js'
 import { Poster } from './poster.js'
-import { CameraEnemy } from './camera.js'
 import { StartScene } from './scenes/startscene.js'
-import { LevelOne } from './scenes/levelone.js'
+import { Southreach } from './scenes/Southreach.js'
 import { Ironvale } from './scenes/ironvale.js'
+import { Eastwatch } from './scenes/Eastwatch.js'
 import { IronvaleFactory } from './scenes/ironvaleFactory.js'
 
 export class Game extends Engine {
@@ -30,9 +30,8 @@ export class Game extends Engine {
     startGame() {
         console.log("start de game!")
         this.addScene("start", new StartScene());
-        this.addScene("levelone", new LevelOne());
+        this.addScene("southreach", new Southreach());
         this.addScene("ironvale", new Ironvale());
-        this.addScene("ironvalefactory", new IronvaleFactory());
         this.goToScene("start")
     }
 }

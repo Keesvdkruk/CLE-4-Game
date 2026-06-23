@@ -1,5 +1,5 @@
 import { Actor, Color, CollisionType, Axis, BoundingBox, Scene } from "excalibur"
-import { CameraEnemy } from "../camera"
+import { Drone } from "../drone"
 import { Ground } from "../ground"
 import { Platform } from "../platform"
 import { Player } from "../player"
@@ -8,7 +8,7 @@ import { Poster } from "../poster"
 import { Background } from "../background"
 import { Resources } from "../resources"
 
-export class LevelOne extends Scene {
+export class Eastwatch extends Scene {
 
     onInitialize(engine) {
 
@@ -18,16 +18,16 @@ export class LevelOne extends Scene {
         // Hoe lager de snelheid (bijv 0.1), hoe trager hij beweegt (ver weg).
         
         // Laag 1: De oranje lucht (beweegt bijna niet)
-        this.add(new Background(Resources.Bg1, 0.05, -104))
+        this.add(new Background(Resources.Eastwatch1, 0.05, -104))
         
         // Laag 2: Verste gebouwen
-        this.add(new Background(Resources.Bg2, 0.2, -103))
+        this.add(new Background(Resources.Eastwatch2, 0.2, -103))
         
         // Laag 3: Middelste gebouwen
-        this.add(new Background(Resources.Bg3, 0.4, -102))
+        this.add(new Background(Resources.Eastwatch3, 0.4, -102))
         
         // Laag 4: Voorste machinerie (beweegt het snelst, maar nog steeds trager dan de speler)
-        this.add(new Background(Resources.Bg4, 0.6, -101))
+        this.add(new Background(Resources.Eastwatch4, 0.6, -101))
 
 
         // --- DE REST VAN JE LEVEL ---
@@ -49,12 +49,8 @@ export class LevelOne extends Scene {
         this.add(new Poster(2500, 620))
         this.add(new Poster(1400, 220))
 
-        this.add(new Platform(600, 550, 200, 30))
-        this.add(new Platform(1000, 450, 200, 30))
-        this.add(new Platform(1400, 300, 300, 30))
-
-        this.add(new CameraEnemy(700, 660))
-        this.add(new CameraEnemy(1300, 260))
+        this.add(new Drone(700, 660))
+        this.add(new Drone(1300, 260))
 
         const player = new Player()
         this.add(player)
@@ -66,6 +62,5 @@ export class LevelOne extends Scene {
             right: 4000,
             bottom: 720
         }))
-
     }
 }
