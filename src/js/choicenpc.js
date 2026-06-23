@@ -21,6 +21,9 @@ export class ChoiceNpc extends Actor {
         // 1 = Asking question
         // 2 = Answered
         this.dialogueState = 0 
+        
+        // Timer om de animatie na precies 1 loop te stoppen
+        this.introAnimEndTime = null
     }
 
     setPlayer(player) {
@@ -43,20 +46,28 @@ export class ChoiceNpc extends Actor {
         const idleAnim1 = Animation.fromSpriteSheet(idleSheet, [0, 1, 2, 3, 4, 5], 120)
         idleAnim1.scale = new Vector(1.2, 1.2)
 
-        const idleAnim2 = Animation.fromSpriteSheet(idleSheet, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 120)
-        idleAnim2.scale = new Vector(1.2, 1.2)
-        this.graphics.add("idle2", idleAnim2)
-
+        // Sla de idleAnim2 op als class property (this.idleAnim2) zodat we hem later kunnen resetten
+        this.idleAnim2 = Animation.fromSpriteSheet(idleSheet2, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 120)
+        this.idleAnim2.scale = new Vector(1.2, 1.2)
+        
+        this.graphics.add("idle2", this.idleAnim2)
         this.graphics.add("idle1", idleAnim1)
         this.graphics.use("idle1")
 
         this.on('collisionstart', (evt) => {
             if (evt.other.owner === this.player) {
                 this.isPlayerNear = true
-                this.graphics.use("idle2")
                 
                 if (this.dialogueState === 0) {
                     this.dialogueState = 1
+                    
+                    // 1. Zorg dat de animatie weer vanaf frame 0 begint!
+                    this.idleAnim2.reset()
+                    this.graphics.use("idle2")
+                    
+                    // 2. Bereken wanneer de animatie precies klaar is (11 frames * 120ms = 1320ms)
+                    this.introAnimEndTime = Date.now() + 1320
+                    
                     this.showDialogue("Hey rebel... will you help us?\n[Y]es or [N]o")
                 }
             }
@@ -68,6 +79,7 @@ export class ChoiceNpc extends Actor {
                 this.graphics.use("idle1")
                 this.isPlayerNear = false
                 this.dialogueState = 0
+                this.introAnimEndTime = null // Annuleer de timer voor het geval de speler halverwege de animatie wegloopt
                 this.hideDialogue()
             }
         })
@@ -75,6 +87,13 @@ export class ChoiceNpc extends Actor {
 
     onPreUpdate(engine) {
         if (!this.player) return
+
+        // --- ANIMATIE TIMER CHECK ---
+        // Als de timer loopt EN de huidige tijd is voorbij de eindtijd:
+        if (this.introAnimEndTime !== null && Date.now() >= this.introAnimEndTime) {
+            this.graphics.use("idle1") // Schakel terug naar de standaard idle
+            this.introAnimEndTime = null // Zet de timer weer uit
+        }
 
         if (this.graphics.current) {
             this.graphics.current.flipHorizontal = this.player.pos.x < this.pos.x
