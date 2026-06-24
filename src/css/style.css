@@ -1,3 +1,7 @@
+@font-face {
+    font-family: 'Upheaval';
+    src: url('/fonts/upheavtt.ttf') format('truetype');
+}
 body {
     margin: 0;
     padding: 0;

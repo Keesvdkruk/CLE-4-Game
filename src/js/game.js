@@ -9,7 +9,12 @@ import { StartScene } from './scenes/startscene.js'
 import { Southreach } from './scenes/Southreach.js'
 import { Ironvale } from './scenes/ironvale.js'
 import { Eastwatch } from './scenes/Eastwatch.js'
-
+import { IronvaleFactory } from './scenes/ironvaleFactory.js'
+import { VestraCity } from './scenes/vestracity.js'
+import { GameOver } from './scenes/gameover.js'
+import { VestraCityInside } from './scenes/vestracityinside.js'
+import { RoadToSquare } from './scenes/roadtosquare.js'
+import { Square } from './scenes/square.js';
 
 export class Game extends Engine {
 
@@ -32,9 +37,16 @@ export class Game extends Engine {
         this.addScene("start", new StartScene());
         this.addScene("southreach", new Southreach());
         this.addScene("ironvale", new Ironvale());
+        this.addScene("ironvalefactory", new IronvaleFactory());
         this.addScene("eastwatch", new Eastwatch());
+        this.addScene("vestracity", new VestraCity());
+        this.addScene("gameover", new GameOver());
+        this.addScene("vestracityinside", new VestraCityInside());
+        this.addScene("roadtosquare", new RoadToSquare());
+        this.addScene("square", new Square());
 
-        this.goToScene("start")
+        this.lastScene = "start";
+        this.goToScene("start");
     }
 }
 

@@ -148,7 +148,7 @@ export class Poster extends Actor {
         }
 
         this.promptLabel = new Label({
-            text: "press x to destroy",
+            text: "hold x to destroy",
             color: Color.White,
             font: new Font({
                 family: 'MijnPixelFont', 
