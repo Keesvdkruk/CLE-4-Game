@@ -126,7 +126,7 @@ export class StartScene extends Scene {
         ironvaleLabel.on("pointerdown", () => this.handleClick("ironvale"));
         ironvaleFactoryLabel.on("pointerdown", () => this.handleClick("ironvalefactory"));
         eastwatchLabel.on("pointerdown", () => this.handleClick("eastwatch"));
-        vestraCityLabel.on("pointerdown", () => this.handleClick("vestracityinside"));
+        vestraCityLabel.on("pointerdown", () => this.handleClick("vestracity"));
     }
 
     handleClick(scene) {
