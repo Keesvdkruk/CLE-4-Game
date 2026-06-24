@@ -1,13 +1,19 @@
 import { Actor, Color, CollisionType, Axis, BoundingBox, Scene } from "excalibur"
-import { CameraEnemy } from "../camera"
+import { Drone } from "../drone"
 import { Ground } from "../ground"
 import { Platform } from "../platform"
 import { Player } from "../player"
 import { Poster } from "../poster"
+import { Background } from "../background"
+import { Resources } from "../resources"
 
-export class LevelOne extends Scene {
+export class IronvaleFactory extends Scene {
 
     onInitialize(engine) {
+        this.add(new Background(Resources.BgIronvale, 0.05, -104))
+        this.add(new Background(Resources.BgFactory1, 0.2, -103))
+        this.add(new Background(Resources.BgFactory2, 0.4, -102))
+        this.add(new Background(Resources.BgFactory3, 0.6, -101))
 
         const ground = new Ground()
         this.add(ground)
@@ -27,13 +33,8 @@ export class LevelOne extends Scene {
         this.add(new Poster(2500, 620))
         this.add(new Poster(1400, 220))
 
-        this.add(new Platform(600, 550, 200, 30))
-        this.add(new Platform(1000, 450, 200, 30))
-        this.add(new Platform(1400, 300, 300, 30))
-
-        this.add(new CameraEnemy(700, 660))
-
-        this.add(new CameraEnemy(1300, 260))
+        this.add(new Drone(700, 660))
+        this.add(new Drone(1300, 260))
 
         const player = new Player()
         this.add(player)

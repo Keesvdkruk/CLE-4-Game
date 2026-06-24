@@ -7,7 +7,7 @@ export class Platform extends Actor {
             y: y,
             width: breedte,
             height: hoogte,
-            color: Color.Orange,
+            color: Color.Black,
             collisionType: CollisionType.Fixed 
         })
     }

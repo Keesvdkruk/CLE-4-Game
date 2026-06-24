@@ -1,12 +1,8 @@
-import { Color, Scene, Label, Font, Actor, Rectangle } from "excalibur";
+import { Color, Scene, Label, Font, FontUnit, Actor, Rectangle } from "excalibur";
 import { Game } from "../game";
 
 
 export class StartScene extends Scene {
-    /**
-     * 
-     * @param {Game} engine 
-     */
     onInitialize(engine) {
         const overlay = new Actor({
             x: engine.drawWidth / 2,
@@ -21,25 +17,28 @@ export class StartScene extends Scene {
         }));
         this.add(overlay);
 
-
         const settingsLabel = new Label({
             color: Color.White,
-            x: engine.drawWidth / 2 - 160,
+            x: engine.drawWidth / 2 - 250, 
             y: engine.drawHeight / 4,
-            text: "State of Venstra",
+            text: "State of Vestra",
             font: new Font({
-                size: 75
+                family: 'MijnPixelFont', 
+                size: 75,
+                unit: FontUnit.Px 
             })
         });
         this.add(settingsLabel);
 
-        const levelOneLabel = new Label({
+        const southreachLabel = new Label({
             color: Color.White,
             x: engine.drawWidth / 2 - 100,
             y: engine.drawHeight / 2 + 50,
-            text: "level 1",
+            text: "Southreach",
             font: new Font({
-                size: 75
+                family: 'MijnPixelFont', 
+                size: 50, 
+                unit: FontUnit.Px
             })
 
         });
@@ -57,12 +56,68 @@ export class StartScene extends Scene {
         vestraCityLabel.on("pointerdown", () => {
             this.engine.goToScene("square");
         });
-        this.add(levelOneLabel);
+        this.add(southreachLabel);
 
-        levelOneLabel.on("pointerdown", () => this.handleClick());
+        const ironvaleLabel = new Label({
+            color: Color.White,
+            x: engine.drawWidth / 2 - 100,
+            y: engine.drawHeight / 2 + 100,
+            text: "Ironvale",
+            font: new Font({
+                family: 'MijnPixelFont', 
+                size: 50, 
+                unit: FontUnit.Px
+            })
+        });
+        this.add(ironvaleLabel);
+
+         const ironvaleFactoryLabel = new Label({
+            color: Color.White,
+            x: engine.drawWidth / 2 - 100,
+            y: engine.drawHeight / 2 + 150,
+            text: "Ironvale Factory",
+            font: new Font({
+                family: 'MijnPixelFont', // EN HIER OOK!
+                size: 50, // Pixel fonts zijn vaak wat groter, dus speel met deze grootte
+                unit: FontUnit.Px
+            })
+        });
+        this.add(ironvaleFactoryLabel);
+
+        const eastwatchLabel = new Label({
+            color: Color.White,
+            x: engine.drawWidth / 2 - 100,
+            y: engine.drawHeight / 2 + 200,
+            text: "Eastwatch",
+            font: new Font({
+                family: 'MijnPixelFont', 
+                size: 50, 
+                unit: FontUnit.Px
+            })
+        });
+        this.add(eastwatchLabel);
+
+        southreachLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
+        southreachLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+
+        ironvaleLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
+        ironvaleLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+
+        ironvaleFactoryLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
+        ironvaleFactoryLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+
+        eastwatchLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
+        eastwatchLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+
+        southreachLabel.on("pointerdown", () => this.handleClick("southreach"));
+        ironvaleLabel.on("pointerdown", () => this.handleClick("ironvale"));
+        ironvaleFactoryLabel.on("pointerdown", () => this.handleClick("ironvalefactory"));
+        eastwatchLabel.on("pointerdown", () => this.handleClick("eastwatch"));
     }
 
-    handleClick() {
-        this.engine.goToScene("levelone");
+    handleClick(scene) {
+        this.engine.canvas.style.cursor = 'default';
+        this.engine.goToScene(scene);
+
     }
 }
