@@ -61,7 +61,7 @@ export class Player extends Actor {
             
         } else if (engine.input.keyboard.isHeld(Keys.Right)) {
             this.vel.x = 300
-            this.facingLeft = CSSFontFeatureValuesRule
+            this.facingLeft = false
             this.graphics.use("walk")
             
         } else {

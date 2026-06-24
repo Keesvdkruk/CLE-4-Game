@@ -1,6 +1,7 @@
 import { Color, Scene, Label, Font, Actor, Rectangle } from "excalibur";
 import { Game } from "../game";
 
+
 export class StartScene extends Scene {
     /**
      * 
@@ -40,6 +41,21 @@ export class StartScene extends Scene {
             font: new Font({
                 size: 75
             })
+
+        });
+        const vestraCityLabel = new Label({
+            color: Color.Red,
+            x: engine.drawWidth / 2 - 180,
+            y: engine.drawHeight / 2 + 150,
+            text: "Vestra City",
+            font: new Font({
+                size: 60
+            })
+        });
+        this.add(vestraCityLabel);
+
+        vestraCityLabel.on("pointerdown", () => {
+            this.engine.goToScene("square");
         });
         this.add(levelOneLabel);
 
