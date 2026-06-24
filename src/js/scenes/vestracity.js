@@ -246,6 +246,7 @@ export class VestraCity extends Scene {
             guardTimer.start();
 
             const player = new Player();
+            player.name = "player";
             player.pos.x = 120;
             player.pos.y = 560;
             this.add(player);
@@ -290,6 +291,7 @@ export class VestraCity extends Scene {
 
                             if (fade.graphics.opacity >= 1) {
                                 fadeTimer.cancel();
+                                engine.lastScene = "vestracity";
                                 engine.goToScene("gameover");
                             }
                         }
