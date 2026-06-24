@@ -34,9 +34,9 @@ export const Resources = {
     Bg3Ironvale: new ImageSource('/ironvale/ironvale3.png'),
     Bg4Ironvale: new ImageSource('/ironvale/ironvale4.png'),
 
-    BgFactory2: new ImageSource('/ironvale/factory.png'),
-    BgFactory3: new ImageSource('/ironvale/factory2.png'),
-    BgFactory4: new ImageSource('/ironvale/factory3.png'),
+    BgFactory1: new ImageSource('/ironvale/factory1.png'),
+    BgFactory2: new ImageSource('/ironvale/factory2.png'),
+    BgFactory3: new ImageSource('/ironvale/factory3.png'),
 
     //Efe:
     Eastwatch1: new ImageSource('/eastwatch/Eastwatch1.png'),

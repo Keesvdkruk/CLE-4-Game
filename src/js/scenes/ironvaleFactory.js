@@ -11,9 +11,9 @@ export class IronvaleFactory extends Scene {
 
     onInitialize(engine) {
         this.add(new Background(Resources.BgIronvale, 0.05, -104))
-        this.add(new Background(Resources.Factory2, 0.2, -103))
-        this.add(new Background(Resources.Factory3, 0.4, -102))
-        this.add(new Background(Resources.Factory4, 0.6, -101))
+        this.add(new Background(Resources.BgFactory1, 0.2, -103))
+        this.add(new Background(Resources.BgFactory2, 0.4, -102))
+        this.add(new Background(Resources.BgFactory3, 0.6, -101))
 
         const ground = new Ground()
         this.add(ground)
@@ -33,8 +33,8 @@ export class IronvaleFactory extends Scene {
         this.add(new Poster(2500, 620))
         this.add(new Poster(1400, 220))
 
-        this.add(new CameraEnemy(700, 660))
-        this.add(new CameraEnemy(1300, 260))
+        this.add(new Drone(700, 660))
+        this.add(new Drone(1300, 260))
 
         const player = new Player()
         this.add(player)

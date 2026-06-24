@@ -32,6 +32,8 @@ export class Game extends Engine {
         this.addScene("start", new StartScene());
         this.addScene("southreach", new Southreach());
         this.addScene("ironvale", new Ironvale());
+        this.addScene("ironvalefactory", new IronvaleFactory());
+        this.addScene("eastwatch", new Eastwatch());
         this.goToScene("start")
     }
 }
