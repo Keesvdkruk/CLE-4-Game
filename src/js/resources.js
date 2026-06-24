@@ -53,10 +53,6 @@ export const Resources = {
     
     // Fonts
     PixelFont: new FontSource('/fonts/pixel.ttf', 'MijnPixelFont'),
-    Idle: new ImageSource('/images/Idle.png'),
-    Walk: new ImageSource('/images/Walk.png'),
-    Jump: new ImageSource('/images/Jump.png'),
-    Attack: new ImageSource('/images/Attack_1.png'),
 
     // dave
     VestraCity: new ImageSource('/images/vestracity.png'),

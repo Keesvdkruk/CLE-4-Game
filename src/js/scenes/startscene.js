@@ -54,7 +54,7 @@ export class StartScene extends Scene {
         this.add(vestraCityLabel);
 
         vestraCityLabel.on("pointerdown", () => {
-            this.engine.goToScene("square");
+            this.engine.goToScene("vestracity");
         });
         this.add(southreachLabel);
 
