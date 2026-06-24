@@ -26,7 +26,7 @@ export class GameOver extends Scene {
 
         const retryButton = new Actor({
             x: engine.drawWidth / 2,
-            y: 610,
+            y: 640,
             width: 430,
             height: 80,
             collisionType: CollisionType.Passive

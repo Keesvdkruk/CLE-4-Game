@@ -149,9 +149,9 @@ export class VestraCity extends Scene {
             this.add(keycard);
 
             const smallDoorTrigger = new Actor({
-                x: 360,
+                x: 335,
                 y: 610,
-                width: 70,
+                width: 65,
                 height: 120,
                 collisionType: CollisionType.Passive
             });
@@ -194,8 +194,6 @@ export class VestraCity extends Scene {
             const vision = new Actor({
                 x: 1190,
                 y: 570,
-                width: 520,
-                height: 180,
                 collisionType: CollisionType.Passive
             });
 
@@ -208,7 +206,7 @@ export class VestraCity extends Scene {
                 x: 1150,
                 y: 570,
                 width: 420,
-                height: 120,
+                height: 110,
                 collisionType: CollisionType.Passive,
                 color: Color.Red
             });
