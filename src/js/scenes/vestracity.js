@@ -131,7 +131,27 @@ export class VestraCity extends Scene {
             });
 
             this.add(ground);
+            const leftBorder = new Actor({
+                x: -25,
+                y: engine.drawHeight / 2,
+                width: 50,
+                height: engine.drawHeight,
+                collisionType: CollisionType.Fixed
+            });
 
+            leftBorder.graphics.opacity = 0;
+            this.add(leftBorder);
+
+            const rightBorder = new Actor({
+                x: engine.drawWidth + 25,
+                y: engine.drawHeight / 2,
+                width: 50,
+                height: engine.drawHeight,
+                collisionType: CollisionType.Fixed
+            });
+
+            rightBorder.graphics.opacity = 0;
+            this.add(rightBorder);
 
 
             const keycard = new Actor({
@@ -326,7 +346,7 @@ export class VestraCity extends Scene {
             this.on("preupdate", () => {
                 if (nearDoor && hasKeycard && engine.input.keyboard.wasPressed(Keys.E)) {
                     engine.goToScene("vestracityinside");
-                     console.log("E ingedrukt");
+                    console.log("E ingedrukt");
                 }
             });
         };

@@ -29,8 +29,20 @@ export class RoadToSquare extends Scene {
             collisionType: CollisionType.Fixed
         });
 
+
         ground.graphics.opacity = 0;
         this.add(ground);
+
+        const leftBorder = new Actor({
+            x: -25,
+            y: engine.drawHeight / 2,
+            width: 50,
+            height: engine.drawHeight,
+            collisionType: CollisionType.Fixed
+        });
+
+        leftBorder.graphics.opacity = 0;
+        this.add(leftBorder);
 
         const makePlatform = (x, y, width, height = 6) => {
             const platform = new Actor({
