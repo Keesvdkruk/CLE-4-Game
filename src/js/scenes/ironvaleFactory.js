@@ -10,7 +10,7 @@ import { Resources } from "../resources"
 export class IronvaleFactory extends Scene {
 
     onInitialize(engine) {
-        this.add(new Background(Resources.Bg1, 0.05, -104))
+        this.add(new Background(Resources.BgIronvale, 0.05, -104))
         this.add(new Background(Resources.Factory2, 0.2, -103))
         this.add(new Background(Resources.Factory3, 0.4, -102))
         this.add(new Background(Resources.Factory4, 0.6, -101))

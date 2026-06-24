@@ -14,10 +14,10 @@ export class Ironvale extends Scene {
 
     onInitialize(engine) {
         // Moving Background
-        this.add(new Background(Resources.Bg1, 0.05, -104))
-        this.add(new Background(Resources.Bg2, 0.2, -103))
-        this.add(new Background(Resources.Bg3, 0.4, -102))
-        this.add(new Background(Resources.Bg4, 0.6, -101))
+        this.add(new Background(Resources.BgIronvale, 0.05, -104))
+        this.add(new Background(Resources.Bg2Ironvale, 0.2, -103))
+        this.add(new Background(Resources.Bg3Ironvale, 0.4, -102))
+        this.add(new Background(Resources.Bg4Ironvale, 0.6, -101))
 
         const ground = new ironvaleGround()
         this.add(ground)
