@@ -1,4 +1,4 @@
-import { Actor, Keys, CollisionType, SpriteSheet, Animation, Vector } from "excalibur"
+import { Actor, Keys, CollisionType, SpriteSheet, Animation, Vector, Side } from "excalibur"
 import { Resources } from "./resources.js"
 
 export class Player extends Actor {
@@ -31,9 +31,9 @@ export class Player extends Actor {
     onInitialize(engine) {
         const playerScale = 0.75
 
-        this.on('collisionstart', (evt) => {
-            this.onGround = true
-        })
+        // this.on('collisionstart', (evt) => {
+        //     this.onGround = true
+        // })
 
         // Jouw 6 frames voor Idle
         const idleSheet = SpriteSheet.fromImageSource({
@@ -183,5 +183,12 @@ export class Player extends Actor {
         }
 
         this.graphics.current.flipHorizontal = this.facingLeft
+    }
+
+
+    onCollisionStart(self, other, side, contact) {
+        if (side === Side.Bottom) {
+            this.onGround = true
+        }
     }
 }
