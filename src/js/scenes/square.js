@@ -37,6 +37,28 @@ export class Square extends Scene {
         ground.graphics.opacity = 0;
         this.add(ground);
 
+        const leftBorder = new Actor({
+            x: -25,
+            y: engine.drawHeight / 2,
+            width: 50,
+            height: engine.drawHeight,
+            collisionType: CollisionType.Fixed
+        });
+
+        leftBorder.graphics.opacity = 0;
+        this.add(leftBorder);
+
+        const rightBorder = new Actor({
+            x: engine.drawWidth + 19,
+            y: engine.drawHeight / 2,
+            width: 50,
+            height: engine.drawHeight,
+            collisionType: CollisionType.Fixed
+        });
+
+        rightBorder.graphics.opacity = 0;
+        this.add(rightBorder);
+
         const player = new Player();
         player.name = "player";
         player.pos.x = 120;
@@ -60,7 +82,7 @@ export class Square extends Scene {
         this.add(objective);
 
         const statueTrigger = new Actor({
-            x: 820,
+            x: 650,
             y: 520,
             width: 260,
             height: 300,

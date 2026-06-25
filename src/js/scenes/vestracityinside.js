@@ -17,6 +17,28 @@ export class VestraCityInside extends Scene {
         });
         this.add(ground);
 
+        const leftBorder = new Actor({
+            x: -25,
+            y: engine.drawHeight / 2,
+            width: 50,
+            height: engine.drawHeight,
+            collisionType: CollisionType.Fixed
+        });
+
+        leftBorder.graphics.opacity = 0;
+        this.add(leftBorder);
+
+        const rightBorder = new Actor({
+            x: engine.drawWidth + 25,
+            y: engine.drawHeight / 2,
+            width: 50,
+            height: engine.drawHeight,
+            collisionType: CollisionType.Fixed
+        });
+
+        rightBorder.graphics.opacity = 0;
+        this.add(rightBorder);
+
         const player = new Player();
         player.name = "player";
         player.pos.x = 1130;
@@ -109,12 +131,12 @@ export class VestraCityInside extends Scene {
         };
 
         const leverTrigger = new Actor({
-            x: 700,
-            y: 590,
+            x: 740,
+            y: 560,
             width: 120,
             height: 130,
             collisionType: CollisionType.Passive
-        });
+        })
 
         leverTrigger.graphics.opacity = 0;
         this.add(leverTrigger);
@@ -185,9 +207,11 @@ export class VestraCityInside extends Scene {
                     leverChoiceMade = true;
                     gateOpen = true;
 
+                    rightBorder.kill();
+
                     bg.graphics.use(Resources.VestraInsideOpen.toSprite());
                     choiceText.text = "De poort gaat open...";
-
+                    
                     const fade = new Actor({
                         x: engine.drawWidth / 2,
                         y: engine.drawHeight / 2,

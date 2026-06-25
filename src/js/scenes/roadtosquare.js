@@ -29,8 +29,20 @@ export class RoadToSquare extends Scene {
             collisionType: CollisionType.Fixed
         });
 
+
         ground.graphics.opacity = 0;
         this.add(ground);
+
+        const leftBorder = new Actor({
+            x: -25,
+            y: engine.drawHeight / 2,
+            width: 50,
+            height: engine.drawHeight,
+            collisionType: CollisionType.Fixed
+        });
+
+        leftBorder.graphics.opacity = 0;
+        this.add(leftBorder);
 
         const makePlatform = (x, y, width, height = 6) => {
             const platform = new Actor({
@@ -97,6 +109,15 @@ export class RoadToSquare extends Scene {
 
         let playerHit = false;
         let levelCompleted = false;
+        let startTime = Date.now();
+        let currentTime = 0;
+
+        let bestTime = localStorage.getItem("roadToSquareBestTime");
+
+        if (bestTime !== null) {
+            bestTime = Number(bestTime);
+        }
+
 
         const spawnBullet = () => {
             if (levelCompleted || playerHit) {
@@ -157,6 +178,31 @@ export class RoadToSquare extends Scene {
         });
 
         this.add(objective);
+        const scoreText = new Label({
+            text: "Time: 0.00",
+            x: 40,
+            y: 70,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 22
+            })
+        });
+
+        this.add(scoreText);
+
+        const highScoreText = new Label({
+            text: bestTime === null ? "Best: --" : "Best: " + bestTime.toFixed(2),
+            x: 40,
+            y: 100,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 22
+            })
+        });
+
+        this.add(highScoreText);
 
         const exitTrigger = new Actor({
             x: levelWidth + 30,
@@ -172,6 +218,16 @@ export class RoadToSquare extends Scene {
         const startLevelTransition = () => {
             levelCompleted = true;
             bulletTimer.cancel();
+
+            currentTime = (Date.now() - startTime) / 1000;
+
+            if (bestTime === null || currentTime < bestTime) {
+                bestTime = currentTime;
+                localStorage.setItem("roadToSquareBestTime", bestTime);
+                highScoreText.text = "Best: " + bestTime.toFixed(2);
+            }
+
+            scoreText.text = "Time: " + currentTime.toFixed(2);
 
             objective.text = "Je bereikt het centrale plein...";
 
@@ -229,6 +285,17 @@ export class RoadToSquare extends Scene {
 
             objective.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
             objective.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 40;
+            
+            if (!levelCompleted && !playerHit) {
+                currentTime = (Date.now() - startTime) / 1000;
+                scoreText.text = "Time: " + currentTime.toFixed(2);
+            }
+
+            scoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            scoreText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 70;
+
+            highScoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            highScoreText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 100;
         });
     }
 }
