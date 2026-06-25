@@ -11,6 +11,7 @@ import {
 
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
+import { RoadToSquare } from "./roadtosquare.js";
 
 export class Square extends Scene {
 
@@ -80,6 +81,46 @@ export class Square extends Scene {
         });
 
         this.add(objective);
+
+        const retryTip = new Label({
+            text: "Druk R om je tijd opnieuw te proberen.",
+            x: 320,
+            y: 120,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 28
+            })
+        });
+
+        retryTip.graphics.opacity = 0;
+        this.add(retryTip);
+
+        let tipWait = 0;
+
+        const tipTimer = new Timer({
+            interval: 40,
+            repeats: true,
+            fcn: () => {
+                if (retryTip.graphics.opacity < 1 && tipWait === 0) {
+                    retryTip.graphics.opacity += 0.04;
+                } else {
+                    tipWait++;
+
+                    if (tipWait > 60) {
+                        retryTip.graphics.opacity -= 0.03;
+                    }
+
+                    if (retryTip.graphics.opacity <= 0 && tipWait > 60) {
+                        tipTimer.cancel();
+                        retryTip.kill();
+                    }
+                }
+            }
+        });
+
+        this.add(tipTimer);
+        tipTimer.start();
 
         const statueTrigger = new Actor({
             x: 650,
@@ -179,6 +220,11 @@ export class Square extends Scene {
                 engine.input.keyboard.wasPressed(Keys.E)
             ) {
                 destroyStatue();
+            }
+            if (engine.input.keyboard.wasPressed(Keys.R)) {
+                engine.removeScene("roadtosquare");
+                engine.addScene("roadtosquare", new RoadToSquare());
+                engine.goToScene("roadtosquare");
             }
         });
     }

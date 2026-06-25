@@ -1,6 +1,7 @@
-import { Scene, Actor, CollisionType, Label, Font, Color, Timer } from "excalibur";
+import { Scene, Actor, CollisionType, Label, Font, Color, Timer, Keys } from "excalibur";
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
+
 
 export class RoadToSquare extends Scene {
     onInitialize(engine) {
@@ -43,7 +44,6 @@ export class RoadToSquare extends Scene {
 
         leftBorder.graphics.opacity = 0;
         this.add(leftBorder);
-
         const makePlatform = (x, y, width, height = 6) => {
             const platform = new Actor({
                 x,
@@ -54,36 +54,64 @@ export class RoadToSquare extends Scene {
                 color: Color.fromRGB(210, 200, 160)
             });
 
-            platform.graphics.opacity = 0.2;
+            platform.graphics.opacity = 0.0;
             this.add(platform);
+
+            const shine = new Actor({
+                x: x - width / 2,
+                y: y - 4,
+                width: 17,
+                height: 3,
+                color: Color.fromRGB(255, 245, 190)
+            });
+
+            shine.graphics.opacity = 0.75;
+            shine.z = 100;
+            this.add(shine);
+
+            let shineX = x - width / 2;
+
+            shine.on("preupdate", () => {
+                shineX += 2;
+
+                if (shineX > x + width / 2) {
+                    shineX = x - width / 2;
+                }
+
+                shine.pos.x = shineX;
+                shine.pos.y = y - 4;
+
+                shine.graphics.opacity =
+                    0.35 + Math.sin(performance.now() / 120) * 0.25;
+            });
 
             return platform;
         };
 
         makePlatform(1105, 550, 112);
-        makePlatform(1310, 500, 70);
-        makePlatform(1610, 400, 160);
+        makePlatform(1310, 495, 55);
+        makePlatform(1610, 395, 160);
         makePlatform(1460, 465, 150);
-        makePlatform(1970, 365, 60);
-        makePlatform(2120, 255, 170);
+        makePlatform(1970, 360, 60);
+        makePlatform(2120, 260, 170);
         makePlatform(2520, 305, 160);
         makePlatform(2055, 550, 112);
         makePlatform(2642, 550, 112);
-        makePlatform(2845, 500, 70);
-        makePlatform(4380, 500, 70);
-        makePlatform(5915, 500, 70);
-        makePlatform(7450, 500, 70);
+        makePlatform(2845, 495, 55);
+        makePlatform(4380, 495, 55);
+        makePlatform(5915, 495, 55);
+        makePlatform(7450, 495, 55);
         makePlatform(3000, 465, 150);
         makePlatform(4540, 465, 150);
         makePlatform(6080, 465, 150);
         makePlatform(7620, 465, 150);
-        makePlatform(3150, 400, 160);
-        makePlatform(4690, 400, 160);
-        makePlatform(6230, 400, 160);
+        makePlatform(3150, 395, 160);
+        makePlatform(4690, 395, 160);
+        makePlatform(6230, 395, 160);
         makePlatform(4179, 550, 112);
         makePlatform(5716, 550, 112);
         makePlatform(7250, 550, 112);
-        makePlatform(2855, 190, 120);
+        makePlatform(2855, 185, 120);
         makePlatform(3590, 550, 112);
         makePlatform(5125, 550, 112);
         makePlatform(6660, 550, 112);
@@ -91,15 +119,18 @@ export class RoadToSquare extends Scene {
         makePlatform(5460, 460, 90);
         makePlatform(3925, 460, 90);
         makePlatform(2390, 460, 90);
-        makePlatform(3505, 365, 60);
-        makePlatform(5040, 365, 60);
-        makePlatform(6575, 365, 60);
-        makePlatform(3655, 255, 170);
-        makePlatform(5190, 255, 170);
-        makePlatform(6725, 255, 170);
+        makePlatform(3505, 360, 60);
+        makePlatform(5040, 360, 60);
+        makePlatform(6575, 360, 60);
+        makePlatform(3655, 260, 170);
+        makePlatform(5190, 260, 170);
+        makePlatform(6725, 260, 170);
         makePlatform(4055, 305, 160);
         makePlatform(5590, 305, 160);
         makePlatform(7125, 305, 160);
+        makePlatform(4390, 185, 120);
+        makePlatform(5925, 185, 120);
+        makePlatform(7460, 185, 120);
 
         const player = new Player();
         player.name = "player";
@@ -204,6 +235,19 @@ export class RoadToSquare extends Scene {
 
         this.add(highScoreText);
 
+        const retryText = new Label({
+            text: "Druk R om opnieuw te gaan",
+            x: 900,
+            y: 40,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 22
+            })
+        });
+
+        this.add(retryText);
+
         const exitTrigger = new Actor({
             x: levelWidth + 30,
             y: 360,
@@ -285,7 +329,7 @@ export class RoadToSquare extends Scene {
 
             objective.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
             objective.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 40;
-            
+
             if (!levelCompleted && !playerHit) {
                 currentTime = (Date.now() - startTime) / 1000;
                 scoreText.text = "Time: " + currentTime.toFixed(2);
@@ -296,6 +340,16 @@ export class RoadToSquare extends Scene {
 
             highScoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
             highScoreText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 100;
+
+            retryText.pos.x = this.camera.pos.x + engine.drawWidth / 2 - 360;
+            retryText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 40;
+
+            if (engine.input.keyboard.wasPressed(Keys.R)) {
+                const resetSceneName = "roadtosquare_" + Date.now();
+
+                engine.addScene(resetSceneName, new RoadToSquare());
+                engine.goToScene(resetSceneName);
+            }
         });
     }
 }
