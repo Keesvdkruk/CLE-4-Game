@@ -20,7 +20,7 @@ export const Resources = {
     //HomelessNpc
     Npc1Idle1: new ImageSource('/Homeless_1/Idle.png'),
     Npc1Idle2: new ImageSource('/Homeless_1/Idle_2.png'),
- 
+
     //Kees:
     BgSouthreach: new ImageSource('/southreach/Night/1.png'),
     BgSouthreach2: new ImageSource('/southreach/Night/2.png'),
@@ -38,6 +38,9 @@ export const Resources = {
     BgFactory2: new ImageSource('/ironvale/factory2.png'),
     BgFactory3: new ImageSource('/ironvale/factory3.png'),
 
+    IronvaleIntro: new ImageSource('/ironvale/ironvale.png'),
+
+
     //Efe:
     Eastwatch1: new ImageSource('/eastwatch/Eastwatch1.png'),
     Eastwatch2: new ImageSource('/eastwatch/Eastwatch2.png'),
@@ -46,11 +49,11 @@ export const Resources = {
 
     // Objects
     Platform: new ImageSource('/images/Platform.png'),
-    
+
     // Posters
     IronvalePoster: new ImageSource('/posters/ironvalePoster.png'),
     PropagandaPoster: new ImageSource('/posters/propagandaPoster.png'),
-    
+
     // Fonts
     PixelFont: new FontSource('/fonts/pixel.ttf', 'MijnPixelFont'),
 
@@ -70,8 +73,8 @@ export const Resources = {
     CityRoad_2: new ImageSource('/images/CityRoad_2.png'),
     CityRoad_3: new ImageSource('/images/CityRoad_3.png'),
     Bullet: new ImageSource('/images/bullet.png'),
-   SquareBackground: new ImageSource("/images/square_background.png"),
-   SquareBroken: new ImageSource("/images/Square_Broken.png"),
+    SquareBackground: new ImageSource("/images/square_background.png"),
+    SquareBroken: new ImageSource("/images/Square_Broken.png"),
 }
 
 export const ResourceLoader = new Loader(Object.values(Resources))

@@ -6,6 +6,8 @@ import { Player } from "../player"
 import { Poster } from "../poster"
 import { Background } from "../background"
 import { Resources } from "../resources"
+import { ironvaleGround } from "../ironvaleGround"
+import { ironvalePlatform } from "../ironvalePlatform"
 
 export class IronvaleFactory extends Scene {
 
@@ -15,7 +17,7 @@ export class IronvaleFactory extends Scene {
         this.add(new Background(Resources.BgFactory2, 0.4, -102))
         this.add(new Background(Resources.BgFactory3, 0.6, -101))
 
-        const ground = new Ground()
+        const ground = new ironvaleGround()
         this.add(ground)
 
         const leftWall = new Actor({
@@ -32,6 +34,10 @@ export class IronvaleFactory extends Scene {
         this.add(new Poster(1200, 620))
         this.add(new Poster(2500, 620))
         this.add(new Poster(1400, 220))
+
+        this.add(new ironvalePlatform(600, 550, 350, 30))
+        this.add(new ironvalePlatform(1000, 440, 350, 30))
+        this.add(new ironvalePlatform(1200, 280, 450, 30))
 
         this.add(new Drone(700, 660))
         this.add(new Drone(1300, 260))
