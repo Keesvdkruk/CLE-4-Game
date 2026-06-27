@@ -1,22 +1,13 @@
-import {
-    Scene,
-    Actor,
-    CollisionType,
-    Label,
-    Font,
-    Color,
-    Keys,
-    Timer
-} from "excalibur";
+import { Scene, Actor, CollisionType, Label, Font, Color, Keys, Timer, SpriteSheet, Animation, range } from "excalibur";
 
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
 import { RoadToSquare } from "./roadtosquare.js";
+import { Npc_1 } from "../npc_1.js";
+import { Npc_2 } from "../npc_2.js";
 
 export class Square extends Scene {
-
     onInitialize(engine) {
-
         this.backgroundColor = Color.Black;
 
         const bg = new Actor({
@@ -122,43 +113,197 @@ export class Square extends Scene {
         this.add(tipTimer);
         tipTimer.start();
 
-        const statueTrigger = new Actor({
-            x: 650,
-            y: 520,
-            width: 260,
-            height: 300,
-            collisionType: CollisionType.Passive
-        });
+        const rushCrowd = () => {
+            for (let i = 0; i < 18; i++) {
+                const x = -20 - i * 35;
+                const y = 610 + (Math.random() * 30 - 15);
 
-        statueTrigger.graphics.opacity = 0;
-        this.add(statueTrigger);
+                const NpcClass = Math.random() < 0.5 ? Npc_1 : Npc_2;
+                const npc = new NpcClass(x, y, true);
 
-        statueTrigger.on("collisionstart", (event) => {
-            if (
-                event.other.owner?.name === "player" &&
-                !statueDestroyed
-            ) {
-                nearStatue = true;
-                objective.text = "Druk E om het standbeeld neer te halen";
+                npc.scale.setTo(0.23, 0.23);
+                npc.vel.x = 260 + Math.random() * 100;
+                npc.z = y;
+
+                this.add(npc);
+            }
+        };
+
+        const leaderSheet = SpriteSheet.fromImageSource({
+            image: Resources.President,
+            grid: {
+                rows: 1,
+                columns: 6,
+                spriteWidth: 250,
+                spriteHeight: 1024
             }
         });
 
-        statueTrigger.on("collisionend", (event) => {
-            if (event.other.owner?.name === "player") {
-                nearStatue = false;
+        const leaderWalk = Animation.fromSpriteSheet(
+            leaderSheet,
+            range(0, 5),
+            180
+        );
 
-                if (!statueDestroyed) {
-                    objective.text = "";
+        leaderWalk.loop = true;
+
+        const kneelSheet = SpriteSheet.fromImageSource({
+            image: Resources.President_kneel,
+            grid: {
+                rows: 1,
+                columns: 8,
+                spriteWidth: 192,
+                spriteHeight: 1024
+            }
+        });
+
+        const showEndScreen = () => {
+            objective.kill();
+
+            const blackFade = new Actor({
+                x: engine.drawWidth / 2,
+                y: engine.drawHeight / 2,
+                width: engine.drawWidth,
+                height: engine.drawHeight,
+                color: Color.Black
+            });
+
+            blackFade.z = 9998;
+            blackFade.graphics.opacity = 0;
+            this.add(blackFade);
+
+            const endBg = new Actor({
+                x: engine.drawWidth / 2,
+                y: engine.drawHeight / 2
+            });
+
+            const endSprite = Resources.EndScreen.toSprite();
+            endBg.graphics.use(endSprite);
+            endBg.scale.setTo(
+                engine.drawWidth / endSprite.width,
+                engine.drawHeight / endSprite.height
+            );
+
+            endBg.z = 9999;
+            endBg.graphics.opacity = 0;
+            this.add(endBg);
+
+            const title = new Label({
+                text: "VESTRA IS VRIJ",
+                x: engine.drawWidth / 2 - 230,
+                y: 10,
+                color: Color.Black,
+                font: new Font({
+                    family: "Upheaval",
+                    size: 56
+                })
+            });
+
+            title.z = 10000;
+            title.graphics.opacity = 0;
+            this.add(title);
+
+            const subtitle = new Label({
+                text: "Het volk heeft gewonnen. Een nieuw hoofdstuk begint.",
+                x: engine.drawWidth / 2 - 330,
+                y: 60,
+                color: Color.Black,
+                font: new Font({
+                    family: "Upheaval",
+                    size: 24
+                })
+            });
+
+            subtitle.z = 10000;
+            subtitle.graphics.opacity = 0;
+            this.add(subtitle);
+
+            const fadeTimer = new Timer({
+                interval: 40,
+                repeats: true,
+                fcn: () => {
+                    blackFade.graphics.opacity += 0.03;
+
+                    if (blackFade.graphics.opacity >= 1) {
+                        blackFade.graphics.opacity = 1;
+                    }
+
+                    if (blackFade.graphics.opacity >= 0.85) {
+                        endBg.graphics.opacity += 0.03;
+                        title.graphics.opacity += 0.03;
+                        subtitle.graphics.opacity += 0.03;
+                    }
+
+                    if (endBg.graphics.opacity >= 1) {
+                        endBg.graphics.opacity = 1;
+                        title.graphics.opacity = 1;
+                        subtitle.graphics.opacity = 1;
+                        fadeTimer.cancel();
+                    }
                 }
-            }
-        });
+            });
 
-        const destroyStatue = () => {
-            statueDestroyed = true;
+            this.add(fadeTimer);
+            fadeTimer.start();
+        };
 
-            objective.text = "De menigte bestormt het standbeeld!";
-            this.camera.shake(12, 12, 1200);
+        const spawnLeader = () => {
+            objective.text = "De leider van Vestra komt naar buiten...";
 
+            const leader = new Actor({
+                x: engine.drawWidth + 120,
+                y: 645,
+                width: 90,
+                height: 180,
+                collisionType: CollisionType.Passive
+            });
+
+            leader.graphics.use(leaderWalk.clone());
+            leader.scale.setTo(-0.38, 0.38);
+            leader.vel.x = -75;
+            leader.z = 900;
+
+            this.add(leader);
+
+            leader.on("preupdate", () => {
+                if (leader.pos.x <= 900) {
+                    leader.vel.x = 0;
+                    leader.graphics.use(leaderSheet.getSprite(5, 0));
+                    leader.scale.setTo(-0.38, 0.38);
+
+                    objective.text = "De leider stopt...";
+
+                    const kneelWaitTimer = new Timer({
+                        interval: 2000,
+                        repeats: false,
+                        fcn: () => {
+                            leader.graphics.use(kneelSheet.getSprite(7, 0));
+                            leader.scale.setTo(-0.38, 0.38);
+
+                            objective.text = "De regering geeft zich over.";
+
+                            const endWaitTimer = new Timer({
+                                interval: 4000,
+                                repeats: false,
+                                fcn: () => {
+                                    showEndScreen();
+                                }
+                            });
+
+                            this.add(endWaitTimer);
+                            endWaitTimer.start();
+                        }
+                    });
+
+                    this.add(kneelWaitTimer);
+                    kneelWaitTimer.start();
+
+                    leader.off("preupdate");
+                }
+            });
+        };
+
+        const startBrokenFade = () => {
             const fade = new Actor({
                 x: engine.drawWidth / 2,
                 y: engine.drawHeight / 2,
@@ -181,10 +326,7 @@ export class Square extends Scene {
                         fade.graphics.opacity = 1;
                         fadeInTimer.cancel();
 
-                        bg.graphics.use(
-                            Resources.SquareBroken.toSprite()
-                        );
-
+                        bg.graphics.use(Resources.SquareBroken.toSprite());
                         objective.text = "Het standbeeld ligt in puin.";
 
                         const fadeOutTimer = new Timer({
@@ -196,6 +338,17 @@ export class Square extends Scene {
                                 if (fade.graphics.opacity <= 0) {
                                     fadeOutTimer.cancel();
                                     fade.kill();
+
+                                    const leaderTimer = new Timer({
+                                        interval: 1200,
+                                        repeats: false,
+                                        fcn: () => {
+                                            spawnLeader();
+                                        }
+                                    });
+
+                                    this.add(leaderTimer);
+                                    leaderTimer.start();
                                 }
                             }
                         });
@@ -210,6 +363,54 @@ export class Square extends Scene {
             fadeInTimer.start();
         };
 
+        const statueTrigger = new Actor({
+            x: 650,
+            y: 520,
+            width: 260,
+            height: 300,
+            collisionType: CollisionType.Passive
+        });
+
+        statueTrigger.graphics.opacity = 0;
+        this.add(statueTrigger);
+
+        statueTrigger.on("collisionstart", (event) => {
+            if (event.other.owner?.name === "player" && !statueDestroyed) {
+                nearStatue = true;
+                objective.text = "Druk E om het standbeeld neer te halen";
+            }
+        });
+
+        statueTrigger.on("collisionend", (event) => {
+            if (event.other.owner?.name === "player") {
+                nearStatue = false;
+
+                if (!statueDestroyed) {
+                    objective.text = "";
+                }
+            }
+        });
+
+        const destroyStatue = () => {
+            statueDestroyed = true;
+
+            rushCrowd();
+
+            objective.text = "De menigte bestormt het standbeeld!";
+            this.camera.shake(12, 12, 1200);
+
+            const waitTimer = new Timer({
+                interval: 900,
+                repeats: false,
+                fcn: () => {
+                    startBrokenFade();
+                }
+            });
+
+            this.add(waitTimer);
+            waitTimer.start();
+        };
+
         this.on("preupdate", () => {
             this.camera.pos.x = engine.drawWidth / 2;
             this.camera.pos.y = engine.drawHeight / 2;
@@ -221,10 +422,12 @@ export class Square extends Scene {
             ) {
                 destroyStatue();
             }
+
             if (engine.input.keyboard.wasPressed(Keys.R)) {
-                engine.removeScene("roadtosquare");
-                engine.addScene("roadtosquare", new RoadToSquare());
-                engine.goToScene("roadtosquare");
+                const resetSceneName = "roadtosquare_" + Date.now();
+
+                engine.addScene(resetSceneName, new RoadToSquare());
+                engine.goToScene(resetSceneName);
             }
         });
     }

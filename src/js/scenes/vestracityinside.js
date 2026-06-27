@@ -1,10 +1,16 @@
-import { Scene, Actor, CollisionType, Label, Font, Color, Keys, SpriteSheet, Animation, range, Timer } from "excalibur";
+import { Scene, Actor, CollisionType, Label, Font, Color, Keys, Timer } from "excalibur";
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
+import { Npc_1 } from "../npc_1.js";
+import { Npc_2 } from "../npc_2.js";
 
 export class VestraCityInside extends Scene {
     onInitialize(engine) {
-        const bg = new Actor({ x: engine.drawWidth / 2, y: engine.drawHeight / 2 });
+        const bg = new Actor({
+            x: engine.drawWidth / 2,
+            y: engine.drawHeight / 2
+        });
+
         bg.graphics.use(Resources.VestraInside.toSprite());
         this.add(bg);
 
@@ -15,6 +21,7 @@ export class VestraCityInside extends Scene {
             height: 60,
             collisionType: CollisionType.Fixed
         });
+
         this.add(ground);
 
         const leftBorder = new Actor({
@@ -55,41 +62,23 @@ export class VestraCityInside extends Scene {
             x: 250,
             y: 80,
             color: Color.White,
-            font: new Font({ family: "Upheaval", size: 24 })
+            font: new Font({
+                family: "Upheaval",
+                size: 24
+            })
         });
+
         this.add(choiceText);
-
-        const protestantSheet = SpriteSheet.fromImageSource({
-            image: Resources.ProtestantWalk,
-            grid: {
-                rows: 1,
-                columns: 6,
-                spriteWidth: 256,
-                spriteHeight: 1024
-            }
-        });
-
-        const protestantWalk = Animation.fromSpriteSheet(
-            protestantSheet,
-            range(0, 5),
-            120
-        );
-        protestantWalk.loop = true;
 
         const spawnProtestants = () => {
             for (let i = 0; i < 20; i++) {
-                const protestant = new Actor({
-                    x: 80 + i * 40 + (Math.random() * 20 - 10),
-                    y: 600 + (Math.random() * 12 - 6),
-                    width: 80,
-                    height: 180,
-                    collisionType: CollisionType.Passive
-                });
 
-                protestant.graphics.use(protestantWalk.clone());
+                const x = 80 + i * 40 + (Math.random() * 20 - 10);
+                const y = 600 + (Math.random() * 12 - 6);
 
-                const scale = 0.30 + Math.random() * 0.03;
-                protestant.scale.setTo(scale, scale);
+                const protestant = Math.random() < 0.5
+                    ? new Npc_1(x, y)
+                    : new Npc_2(x, y);
 
                 protestant.vel.x = 42 + Math.random() * 10;
                 this.add(protestant);
@@ -106,7 +95,7 @@ export class VestraCityInside extends Scene {
 
                     const speechText = new Label({
                         text: "NAAR HET PLEIN!",
-                        x: protestant.pos.x - 65,
+                        x: protestant.pos.x + 10,
                         y: protestant.pos.y - 130,
                         color: Color.Black,
                         font: new Font({
@@ -136,7 +125,7 @@ export class VestraCityInside extends Scene {
             width: 120,
             height: 130,
             collisionType: CollisionType.Passive
-        })
+        });
 
         leverTrigger.graphics.opacity = 0;
         this.add(leverTrigger);
@@ -211,7 +200,7 @@ export class VestraCityInside extends Scene {
 
                     bg.graphics.use(Resources.VestraInsideOpen.toSprite());
                     choiceText.text = "De poort gaat open...";
-                    
+
                     const fade = new Actor({
                         x: engine.drawWidth / 2,
                         y: engine.drawHeight / 2,

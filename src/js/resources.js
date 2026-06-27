@@ -75,6 +75,11 @@ export const Resources = {
     Bullet: new ImageSource('/images/bullet.png'),
     SquareBackground: new ImageSource("/images/square_background.png"),
     SquareBroken: new ImageSource("/images/Square_Broken.png"),
+    Npc_1: new ImageSource("/images/Npc_1.png"),
+    Npc_2: new ImageSource("/images/Npc_2.png"),
+    President: new ImageSource("/images/President.png"),
+   President_kneel: new ImageSource("/images/President_kneel.png"),
+   EndScreen: new ImageSource("/images/Endscreen.png"),
 }
 
 export const ResourceLoader = new Loader(Object.values(Resources))
