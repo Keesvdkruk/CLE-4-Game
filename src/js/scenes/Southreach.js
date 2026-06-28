@@ -8,14 +8,12 @@ import { Trader } from "../trader"
 import { Background } from "../background"
 import { Resources } from "../resources"
 import { ChoiceNpc } from "../choicenpc"
-
-// Importeer de globale game state voor het checkpoint-systeem
 import { GameState } from "../state.js" 
 
 export class Southreach extends Scene {
 
-    // Dit vuurt ALLEEN als je de scene voor het eerst (of via goToScene) binnenkomt
     onActivate(context) {
+        // Slaat zowel peace als support op als checkpoint
         GameState.saveCheckpoint();
     }
 
@@ -104,7 +102,7 @@ export class Southreach extends Scene {
         this.add(new Platform(3800, 360, 100, 720))
 
         // ==========================================
-        // UI LAAG VOOR DE PEACE STAT (Volgt de camera niet)
+        // UI LAAG VOOR DE STATS (Vast op het scherm)
         // ==========================================
         this.uiLayer = new ScreenElement({
             x: 30,
@@ -112,6 +110,7 @@ export class Southreach extends Scene {
             z: 9999 
         })
 
+        // 1. Het Peace Label
         this.peaceLabel = new Label({
             text: "Peace: " + GameState.peace + "%",
             color: Color.White,
@@ -121,8 +120,22 @@ export class Southreach extends Scene {
                 unit: FontUnit.Px
             })
         })
-        
         this.uiLayer.addChild(this.peaceLabel)
+
+        // 2. NIEUW: Het Support Label (y: 40 zorgt dat hij eronder staat)
+        this.supportLabel = new Label({
+            text: "Support: " + GameState.support,
+            color: Color.White,
+            x: 0,
+            y: 40, 
+            font: new Font({
+                family: 'MijnPixelFont', 
+                size: 30,
+                unit: FontUnit.Px
+            })
+        })
+        this.uiLayer.addChild(this.supportLabel)
+        
         this.add(this.uiLayer)
 
         // --- CAMERA SETTINGS ---
@@ -135,18 +148,22 @@ export class Southreach extends Scene {
         }))
     }
 
-    // Wordt elke frame uitgevoerd om de UI tekst up-to-date te houden
+    // Wordt elke frame uitgevoerd om de UI live bij te werken
     onPreUpdate(engine, delta) {
         if (this.peaceLabel) {
             this.peaceLabel.text = "Peace: " + GameState.peace + "%"
         }
+        
+        // NIEUW: Update ook de support tekst elke frame
+        if (this.supportLabel) {
+            this.supportLabel.text = "Support: " + GameState.support
+        }
     }
 
     restartLevel() {
-        // Herstel de peace meter naar de opgeslagen beginwaarde van dit level
+        // Reset alle stats (Zowel peace als support vallen terug naar de level-start checkpoint)
         GameState.revertToCheckpoint(); 
 
-        // Veeg de map leeg en bouw hem fris opnieuw op
         this.clear()
         this.camera.clearAllStrategies()
         this.onInitialize(this.engine)

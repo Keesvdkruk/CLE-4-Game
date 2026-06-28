@@ -1,16 +1,23 @@
 export const GameState = {
+    // Peace stat (begint op 100)
     peace: 100,
-    peaceCheckpoint: 100, // De back-up van je score
+    peaceCheckpoint: 100,
+    
+    // NIEUW: Support stat (begint op 0)
+    support: 0,
+    supportCheckpoint: 0,
 
-    // Slaat de huidige peace-waarde op (aanroepen in onActivate)
+    // Slaat alle stats op bij het begin van een level
     saveCheckpoint() {
         this.peaceCheckpoint = this.peace;
-        console.log("Checkpoint opgeslagen in State! Waarde is nu:", this.peace);
+        this.supportCheckpoint = this.support;
+        console.log("Checkpoints opgeslagen! Peace:", this.peace, "| Support:", this.support);
     },
 
-    // Zet de peace-waarde terug naar de back-up (aanroepen bij restart)
+    // Zet alle stats terug naar de opgeslagen waarden bij een KO/herstart
     revertToCheckpoint() {
         this.peace = this.peaceCheckpoint;
-        console.log("State hersteld naar checkpoint! Waarde is weer:", this.peace);
+        this.support = this.supportCheckpoint;
+        console.log("State hersteld! Peace:", this.peace, "| Support:", this.support);
     }
 }
