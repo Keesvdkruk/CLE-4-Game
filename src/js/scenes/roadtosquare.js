@@ -305,7 +305,7 @@ export class RoadToSquare extends Scene {
                         fadeTimer.cancel();
 
                         engine.lastScene = "roadtosquare";
-                        engine.goToScene("square");
+                        engine.goToScene("violencesquare");
                     }
                 }
             });
