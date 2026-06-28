@@ -9,10 +9,15 @@ import { Background } from "../background"
 import { Resources } from "../resources"
 import { ChoiceNpc } from "../choicenpc"
 
-// NIEUW: Importeer de globale game state voor de Peace meter!
+// Importeer de globale game state voor het checkpoint-systeem
 import { GameState } from "../state.js" 
 
 export class Southreach extends Scene {
+
+    // Dit vuurt ALLEEN als je de scene voor het eerst (of via goToScene) binnenkomt
+    onActivate(context) {
+        GameState.saveCheckpoint();
+    }
 
     onInitialize(engine) {
         this.engine = engine
@@ -47,7 +52,7 @@ export class Southreach extends Scene {
         // ==========================================
         this.add(new Poster(400, 620))
         
-        const choiceNpc = new ChoiceNpc(600, 630) 
+        const choiceNpc = new ChoiceNpc(600, 680) 
         choiceNpc.setPlayer(player)
         this.add(choiceNpc)
 
@@ -99,13 +104,12 @@ export class Southreach extends Scene {
         this.add(new Platform(3800, 360, 100, 720))
 
         // ==========================================
-        // UI LAAG VOOR DE PEACE STAT
+        // UI LAAG VOOR DE PEACE STAT (Volgt de camera niet)
         // ==========================================
-        // Een ScreenElement blijft altijd vast op het scherm staan (negeert de camera)
         this.uiLayer = new ScreenElement({
             x: 30,
             y: 30,
-            z: 9999 // Zorg dat het altijd bovenop je achtergronden en speler ligt
+            z: 9999 
         })
 
         this.peaceLabel = new Label({
@@ -131,15 +135,18 @@ export class Southreach extends Scene {
         }))
     }
 
-    // Deze functie wordt elke frame aangeroepen door Excalibur
-    onPreUpdate() {
-        // Zorg dat het getal op het scherm live wordt geüpdatet als je een poster sloopt
+    // Wordt elke frame uitgevoerd om de UI tekst up-to-date te houden
+    onPreUpdate(engine, delta) {
         if (this.peaceLabel) {
             this.peaceLabel.text = "Peace: " + GameState.peace + "%"
         }
     }
 
     restartLevel() {
+        // Herstel de peace meter naar de opgeslagen beginwaarde van dit level
+        GameState.revertToCheckpoint(); 
+
+        // Veeg de map leeg en bouw hem fris opnieuw op
         this.clear()
         this.camera.clearAllStrategies()
         this.onInitialize(this.engine)
