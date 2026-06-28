@@ -29,7 +29,6 @@ export class Drone extends Actor {
                .moveBy(-250, 0, 100)  
         })
 
-        // --- BETRAPT WORDEN ---
         this.on('collisionstart', (evt) => {
             if (evt.other.owner instanceof Player) {
                 console.log("BETRAPT! Terug naar de start.")

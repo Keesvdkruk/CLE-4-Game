@@ -214,6 +214,7 @@ export class VestraCity extends Scene {
             const vision = new Actor({
                 x: 1190,
                 y: 570,
+                z: 10,
                 collisionType: CollisionType.Passive
             });
 
