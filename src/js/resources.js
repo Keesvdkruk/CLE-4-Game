@@ -1,4 +1,4 @@
-import { ImageSource, FontSource, Loader } from 'excalibur'
+import { ImageSource, FontSource, Loader, Sound } from 'excalibur'
 
 export const Resources = {
 
@@ -80,6 +80,7 @@ export const Resources = {
     President: new ImageSource("/images/President.png"),
    President_kneel: new ImageSource("/images/President_kneel.png"),
    EndScreen: new ImageSource("/images/Endscreen.png"),
+   Gunshot: new Sound("/Sounds/Gunshot.wav"),
 }
 
 export const ResourceLoader = new Loader(Object.values(Resources))

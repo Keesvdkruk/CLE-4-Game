@@ -5,6 +5,8 @@ import { Player } from "../player.js";
 import { RoadToSquare } from "./roadtosquare.js";
 import { Npc_1 } from "../npc_1.js";
 import { Npc_2 } from "../npc_2.js";
+import { PeacefulRoadToSquare } from "./peacefulroadtosquare.js";
+
 
 export class Square extends Scene {
     onInitialize(engine) {
@@ -411,24 +413,28 @@ export class Square extends Scene {
             waitTimer.start();
         };
 
-        this.on("preupdate", () => {
-            this.camera.pos.x = engine.drawWidth / 2;
-            this.camera.pos.y = engine.drawHeight / 2;
+    this.on("preupdate", () => {
+    this.camera.pos.x = engine.drawWidth / 2;
+    this.camera.pos.y = engine.drawHeight / 2;
 
-            if (
-                nearStatue &&
-                !statueDestroyed &&
-                engine.input.keyboard.wasPressed(Keys.E)
-            ) {
-                destroyStatue();
-            }
-
-            if (engine.input.keyboard.wasPressed(Keys.R)) {
-                const resetSceneName = "roadtosquare_" + Date.now();
-
-                engine.addScene(resetSceneName, new RoadToSquare());
-                engine.goToScene(resetSceneName);
-            }
-        });
+    if (
+        nearStatue &&
+        !statueDestroyed &&
+        engine.input.keyboard.wasPressed(Keys.E)
+    ) {
+        destroyStatue();
     }
-}
+
+    if (engine.input.keyboard.wasPressed(Keys.R)) {
+        const scene = engine.lastScene || "roadtosquare";
+        const resetSceneName = scene + "_" + Date.now();
+
+        if (scene === "peacefulroadtosquare") {
+            engine.addScene(resetSceneName, new PeacefulRoadToSquare());
+        } else {
+            engine.addScene(resetSceneName, new RoadToSquare());
+        }
+
+        engine.goToScene(resetSceneName);
+    }
+});}}

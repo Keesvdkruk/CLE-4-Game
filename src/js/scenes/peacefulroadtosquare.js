@@ -1,9 +1,8 @@
-import { Scene, Actor, CollisionType, Label, Font, Color, Timer, Keys, } from "excalibur";
+import { Scene, Actor, CollisionType, Label, Font, Color, Timer, Keys } from "excalibur";
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
 
-
-export class RoadToSquare extends Scene {
+export class PeacefulRoadToSquare extends Scene {
     onInitialize(engine) {
         this.backgroundColor = Color.Black;
 
@@ -22,6 +21,104 @@ export class RoadToSquare extends Scene {
             this.add(bg);
         }
 
+        let combo = 0;
+        let bestCombo = 0;
+        let finalScore = 0;
+        let lastPlatformX = 0;
+        let touchedGround = true;
+        let levelCompleted = false;
+        let startTime = Date.now();
+        let currentTime = 0;
+
+        let savedBestCombo = localStorage.getItem("peacefulRoadBestCombo");
+        let savedBestScore = localStorage.getItem("peacefulRoadBestScore");
+
+        if (savedBestCombo !== null) {
+            savedBestCombo = Number(savedBestCombo);
+        }
+
+        if (savedBestScore !== null) {
+            savedBestScore = Number(savedBestScore);
+        }
+
+        const objective = new Label({
+            text: "Objective: bereik rustig het centrale plein.",
+            x: 40,
+            y: 40,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 24
+            })
+        });
+
+        this.add(objective);
+
+        const timeText = new Label({
+            text: "Time: 0.00",
+            x: 40,
+            y: 70,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 22
+            })
+        });
+
+        this.add(timeText);
+
+        const comboText = new Label({
+            text: "Combo: 0",
+            x: 40,
+            y: 100,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 22
+            })
+        });
+
+        this.add(comboText);
+
+        const bestComboText = new Label({
+            text: savedBestCombo === null ? "Best Combo: --" : "Best Combo: " + savedBestCombo,
+            x: 40,
+            y: 130,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 22
+            })
+        });
+
+        this.add(bestComboText);
+
+        const scoreText = new Label({
+            text: savedBestScore === null ? "Best Score: --" : "Best Score: " + savedBestScore,
+            x: 40,
+            y: 160,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 22
+            })
+        });
+
+        this.add(scoreText);
+
+        const retryText = new Label({
+            text: "Druk R om opnieuw te gaan",
+            x: 900,
+            y: 40,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 22
+            })
+        });
+
+        this.add(retryText);
+
         const ground = new Actor({
             x: levelWidth / 2,
             y: 670,
@@ -30,9 +127,18 @@ export class RoadToSquare extends Scene {
             collisionType: CollisionType.Fixed
         });
 
-
         ground.graphics.opacity = 0;
         this.add(ground);
+
+        ground.on("collisionstart", (event) => {
+            if (event.other.owner?.name === "player" && !levelCompleted) {
+                combo = 0;
+                lastPlatformX = 0;
+                touchedGround = true;
+
+                comboText.text = "Combo: 0";
+            }
+        });
 
         const leftBorder = new Actor({
             x: -25,
@@ -44,6 +150,7 @@ export class RoadToSquare extends Scene {
 
         leftBorder.graphics.opacity = 0;
         this.add(leftBorder);
+
         const makePlatform = (x, y, width, height = 6) => {
             const platform = new Actor({
                 x,
@@ -54,8 +161,25 @@ export class RoadToSquare extends Scene {
                 color: Color.fromRGB(210, 200, 160)
             });
 
-            platform.graphics.opacity = 0.0;
+            platform.graphics.opacity = 0;
             this.add(platform);
+
+            platform.on("collisionstart", (event) => {
+                if (event.other.owner?.name === "player" && !levelCompleted) {
+                    if (touchedGround || x > lastPlatformX + 20) {
+                        combo = touchedGround ? 1 : combo + 1;
+                        touchedGround = false;
+                        lastPlatformX = x;
+
+                        if (combo > bestCombo) {
+                            bestCombo = combo;
+                        }
+
+                        comboText.text = "Combo: " + combo;
+                        bestComboText.text = "Best Combo: " + Math.max(bestCombo, savedBestCombo || 0);
+                    }
+                }
+            });
 
             const shine = new Actor({
                 x: x - width / 2,
@@ -80,9 +204,7 @@ export class RoadToSquare extends Scene {
 
                 shine.pos.x = shineX;
                 shine.pos.y = y - 4;
-
-                shine.graphics.opacity =
-                    0.35 + Math.sin(performance.now() / 120) * 0.25;
+                shine.graphics.opacity = 0.35 + Math.sin(performance.now() / 120) * 0.25;
             });
 
             return platform;
@@ -138,120 +260,6 @@ export class RoadToSquare extends Scene {
         player.pos.y = 560;
         this.add(player);
 
-        let playerHit = false;
-        let levelCompleted = false;
-        let startTime = Date.now();
-        let currentTime = 0;
-
-        let bestTime = localStorage.getItem("roadToSquareBestTime");
-
-        if (bestTime !== null) {
-            bestTime = Number(bestTime);
-        }
-
-
-        const spawnBullet = () => {
-            if (levelCompleted || playerHit) {
-                return;
-            }
-
-            const bullet = new Actor({
-                x: this.camera.pos.x + engine.drawWidth / 2 + 80,
-                y: 180 + Math.random() * 450,
-                width: 36,
-                height: 14,
-                collisionType: CollisionType.Passive
-            });
-
-            bullet.graphics.use(Resources.Bullet.toSprite());
-            bullet.scale.setTo(0.05, 0.05);
-            bullet.vel.x = -430;
-
-            this.add(bullet);
-
-            Resources.Gunshot.play(0.18);
-
-
-
-            bullet.on("collisionstart", (event) => {
-                if (event.other.owner?.name === "player" && !playerHit && !levelCompleted) {
-                    playerHit = true;
-                    console.log("Speler geraakt!");
-
-                    engine.lastScene = "roadtosquare";
-                    engine.goToScene("gameover");
-                }
-            });
-
-            bullet.on("preupdate", () => {
-                if (bullet.pos.x < this.camera.pos.x - engine.drawWidth / 2 - 100) {
-                    bullet.kill();
-                }
-            });
-        };
-
-        const bulletTimer = new Timer({
-            interval: 800,
-            repeats: true,
-            fcn: () => {
-                spawnBullet();
-            }
-        });
-
-        this.add(bulletTimer);
-        bulletTimer.start();
-
-        const objective = new Label({
-            text: "Objective: volg de menigte richting het centrale plein.",
-            x: 40,
-            y: 40,
-            color: Color.White,
-            font: new Font({
-                family: "Upheaval",
-                size: 24
-            })
-        });
-
-        this.add(objective);
-        const scoreText = new Label({
-            text: "Time: 0.00",
-            x: 40,
-            y: 70,
-            color: Color.White,
-            font: new Font({
-                family: "Upheaval",
-                size: 22
-            })
-        });
-
-        this.add(scoreText);
-
-        const highScoreText = new Label({
-            text: bestTime === null ? "Best: --" : "Best: " + bestTime.toFixed(2),
-            x: 40,
-            y: 100,
-            color: Color.White,
-            font: new Font({
-                family: "Upheaval",
-                size: 22
-            })
-        });
-
-        this.add(highScoreText);
-
-        const retryText = new Label({
-            text: "Druk R om opnieuw te gaan",
-            x: 900,
-            y: 40,
-            color: Color.White,
-            font: new Font({
-                family: "Upheaval",
-                size: 22
-            })
-        });
-
-        this.add(retryText);
-
         const exitTrigger = new Actor({
             x: levelWidth + 30,
             y: 360,
@@ -265,19 +273,31 @@ export class RoadToSquare extends Scene {
 
         const startLevelTransition = () => {
             levelCompleted = true;
-            bulletTimer.cancel();
-
             currentTime = (Date.now() - startTime) / 1000;
 
-            if (bestTime === null || currentTime < bestTime) {
-                bestTime = currentTime;
-                localStorage.setItem("roadToSquareBestTime", bestTime);
-                highScoreText.text = "Best: " + bestTime.toFixed(2);
+            finalScore = bestCombo * 100 - Math.floor(currentTime * 5);
+
+            if (finalScore < 0) {
+                finalScore = 0;
             }
 
-            scoreText.text = "Time: " + currentTime.toFixed(2);
+            if (bestCombo > 0 && (savedBestCombo === null || bestCombo > savedBestCombo)) {
+                savedBestCombo = bestCombo;
+                localStorage.setItem("peacefulRoadBestCombo", savedBestCombo);
+            }
 
-            objective.text = "Je bereikt het centrale plein...";
+            if (savedBestScore === null || finalScore > savedBestScore) {
+                savedBestScore = finalScore;
+                localStorage.setItem("peacefulRoadBestScore", savedBestScore);
+                scoreText.text = "Score: " + finalScore + "  NEW RECORD!";
+            } else {
+                scoreText.text = "Score: " + finalScore;
+            }
+
+            timeText.text = "Final Time: " + currentTime.toFixed(2);
+            comboText.text = "Final Combo: " + bestCombo;
+            bestComboText.text = "Best Combo: " + savedBestCombo;
+            objective.text = "Je bereikt het centrale plein in vrede...";
 
             const fade = new Actor({
                 x: this.camera.pos.x,
@@ -297,14 +317,13 @@ export class RoadToSquare extends Scene {
                 fcn: () => {
                     fade.pos.x = this.camera.pos.x;
                     fade.pos.y = this.camera.pos.y;
-
                     fade.graphics.opacity += 0.04;
 
                     if (fade.graphics.opacity >= 1) {
                         fade.graphics.opacity = 1;
                         fadeTimer.cancel();
 
-                        engine.lastScene = "roadtosquare";
+                        engine.lastScene = "peacefulroadtosquare";
                         engine.goToScene("square");
                     }
                 }
@@ -335,24 +354,30 @@ export class RoadToSquare extends Scene {
             objective.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
             objective.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 40;
 
-            if (!levelCompleted && !playerHit) {
-                currentTime = (Date.now() - startTime) / 1000;
-                scoreText.text = "Time: " + currentTime.toFixed(2);
-            }
+            timeText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            timeText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 70;
+
+            comboText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            comboText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 100;
+
+            bestComboText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            bestComboText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 130;
 
             scoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
-            scoreText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 70;
-
-            highScoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
-            highScoreText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 100;
+            scoreText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 160;
 
             retryText.pos.x = this.camera.pos.x + engine.drawWidth / 2 - 360;
             retryText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 40;
 
-            if (engine.input.keyboard.wasPressed(Keys.R)) {
-                const resetSceneName = "roadtosquare_" + Date.now();
+            if (!levelCompleted) {
+                currentTime = (Date.now() - startTime) / 1000;
+                timeText.text = "Time: " + currentTime.toFixed(2);
+            }
 
-                engine.addScene(resetSceneName, new RoadToSquare());
+            if (engine.input.keyboard.wasPressed(Keys.R)) {
+                const resetSceneName = "peacefulroadtosquare_" + Date.now();
+
+                engine.addScene(resetSceneName, new PeacefulRoadToSquare());
                 engine.goToScene(resetSceneName);
             }
         });
