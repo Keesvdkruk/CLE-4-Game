@@ -1,10 +1,18 @@
-import { Scene, Actor, CollisionType, Label, Font, Color, Keys, SpriteSheet, Animation, range, Timer } from "excalibur";
+import { Scene, Actor, CollisionType, Label, Font, Color, Keys, Timer } from "excalibur";
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
+import { Npc_1 } from "../npc_1.js";
+import { Npc_2 } from "../npc_2.js";
+import { GameState } from "../state.js";
+import { HUD } from "../HUD.js";
 
 export class VestraCityInside extends Scene {
     onInitialize(engine) {
-        const bg = new Actor({ x: engine.drawWidth / 2, y: engine.drawHeight / 2 });
+        const bg = new Actor({
+            x: engine.drawWidth / 2,
+            y: engine.drawHeight / 2
+        });
+
         bg.graphics.use(Resources.VestraInside.toSprite());
         this.add(bg);
 
@@ -15,7 +23,33 @@ export class VestraCityInside extends Scene {
             height: 60,
             collisionType: CollisionType.Fixed
         });
+
         this.add(ground);
+
+        const hud = new HUD();
+        this.add(hud);
+
+        const leftBorder = new Actor({
+            x: -25,
+            y: engine.drawHeight / 2,
+            width: 50,
+            height: engine.drawHeight,
+            collisionType: CollisionType.Fixed
+        });
+
+        leftBorder.graphics.opacity = 0;
+        this.add(leftBorder);
+
+        const rightBorder = new Actor({
+            x: engine.drawWidth + 25,
+            y: engine.drawHeight / 2,
+            width: 50,
+            height: engine.drawHeight,
+            collisionType: CollisionType.Fixed
+        });
+
+        rightBorder.graphics.opacity = 0;
+        this.add(rightBorder);
 
         const player = new Player();
         player.name = "player";
@@ -33,41 +67,32 @@ export class VestraCityInside extends Scene {
             x: 250,
             y: 80,
             color: Color.White,
-            font: new Font({ family: "Upheaval", size: 24 })
+            font: new Font({
+                family: "Upheaval",
+                size: 24
+            })
         });
+
         this.add(choiceText);
 
-        const protestantSheet = SpriteSheet.fromImageSource({
-            image: Resources.ProtestantWalk,
-            grid: {
-                rows: 1,
-                columns: 6,
-                spriteWidth: 256,
-                spriteHeight: 1024
-            }
-        });
 
-        const protestantWalk = Animation.fromSpriteSheet(
-            protestantSheet,
-            range(0, 5),
-            120
-        );
-        protestantWalk.loop = true;
+        
+
+
+        const getRebelAmount = () => {
+            return Math.max(4, Math.floor(GameState.support / 5));
+        };
 
         const spawnProtestants = () => {
-            for (let i = 0; i < 20; i++) {
-                const protestant = new Actor({
-                    x: 80 + i * 40 + (Math.random() * 20 - 10),
-                    y: 600 + (Math.random() * 12 - 6),
-                    width: 80,
-                    height: 180,
-                    collisionType: CollisionType.Passive
-                });
+            const rebelAmount = getRebelAmount();
 
-                protestant.graphics.use(protestantWalk.clone());
+            for (let i = 0; i < rebelAmount; i++) {
+                const x = 80 + i * 55 + (Math.random() * 20 - 10);
+                const y = 600 + (Math.random() * 12 - 6);
 
-                const scale = 0.30 + Math.random() * 0.03;
-                protestant.scale.setTo(scale, scale);
+                const protestant = Math.random() < 0.5
+                    ? new Npc_1(x, y)
+                    : new Npc_2(x, y);
 
                 protestant.vel.x = 42 + Math.random() * 10;
                 this.add(protestant);
@@ -84,7 +109,7 @@ export class VestraCityInside extends Scene {
 
                     const speechText = new Label({
                         text: "NAAR HET PLEIN!",
-                        x: protestant.pos.x - 65,
+                        x: protestant.pos.x + 10,
                         y: protestant.pos.y - 130,
                         color: Color.Black,
                         font: new Font({
@@ -108,9 +133,54 @@ export class VestraCityInside extends Scene {
             }
         };
 
+        const goToCorrectRoadScene = () => {
+            if (GameState.peace <= 50) {
+                engine.goToScene("roadtosquare");
+            } else {
+                engine.goToScene("peacefulroadtosquare");
+            }
+        };
+
+        const startExitFade = () => {
+            leavingScene = true;
+
+            choiceText.text = GameState.peace <= 50
+                ? "De stad kookt over. De menigte trekt gewelddadig naar het plein..."
+                : "De menigte trekt rustig richting het centrale plein...";
+
+            GameState.saveCheckpoint();
+
+            const fade = new Actor({
+                x: engine.drawWidth / 2,
+                y: engine.drawHeight / 2,
+                width: engine.drawWidth,
+                height: engine.drawHeight,
+                color: Color.Black
+            });
+
+            fade.graphics.opacity = 0;
+            this.add(fade);
+
+            const fadeTimer = new Timer({
+                interval: 40,
+                repeats: true,
+                fcn: () => {
+                    fade.graphics.opacity += 0.05;
+
+                    if (fade.graphics.opacity >= 1) {
+                        fadeTimer.cancel();
+                        goToCorrectRoadScene();
+                    }
+                }
+            });
+
+            this.add(fadeTimer);
+            fadeTimer.start();
+        };
+
         const leverTrigger = new Actor({
-            x: 700,
-            y: 590,
+            x: 740,
+            y: 560,
             width: 120,
             height: 130,
             collisionType: CollisionType.Passive
@@ -122,7 +192,7 @@ export class VestraCityInside extends Scene {
         leverTrigger.on("collisionstart", (event) => {
             if (event.other.owner?.name === "player" && !leverChoiceMade) {
                 nearLever = true;
-                choiceText.text = "E: open de poort voor support    Q: houd de poort dicht voor peace";
+                choiceText.text = "E: open de poort     Q: houd de poort dicht";
             }
         });
 
@@ -146,36 +216,7 @@ export class VestraCityInside extends Scene {
 
         exitTrigger.on("collisionstart", (event) => {
             if (gateOpen && event.other.owner?.name === "player" && !leavingScene) {
-                leavingScene = true;
-
-                choiceText.text = "De menigte trekt richting het centrale plein...";
-
-                const fade = new Actor({
-                    x: engine.drawWidth / 2,
-                    y: engine.drawHeight / 2,
-                    width: engine.drawWidth,
-                    height: engine.drawHeight,
-                    color: Color.Black
-                });
-
-                fade.graphics.opacity = 0;
-                this.add(fade);
-
-                const fadeTimer = new Timer({
-                    interval: 40,
-                    repeats: true,
-                    fcn: () => {
-                        fade.graphics.opacity += 0.05;
-
-                        if (fade.graphics.opacity >= 1) {
-                            fadeTimer.cancel();
-                            engine.goToScene("roadtosquare");
-                        }
-                    }
-                });
-
-                this.add(fadeTimer);
-                fadeTimer.start();
+                startExitFade();
             }
         });
 
@@ -185,8 +226,18 @@ export class VestraCityInside extends Scene {
                     leverChoiceMade = true;
                     gateOpen = true;
 
+                    GameState.peace -= 20;
+
+                    if (GameState.peace < 0) {
+                        GameState.peace = 0;
+                    }
+
+                   
+
+                    rightBorder.kill();
+
                     bg.graphics.use(Resources.VestraInsideOpen.toSprite());
-                    choiceText.text = "De poort gaat open...";
+                    choiceText.text = "De poort gaat open. Peace -20.";
 
                     const fade = new Actor({
                         x: engine.drawWidth / 2,
@@ -212,7 +263,7 @@ export class VestraCityInside extends Scene {
                                     fade.graphics.opacity = 1;
                                     fadingBack = true;
 
-                                    choiceText.text = "De menigte stroomt het plein op.";
+                                    choiceText.text = "Rebellen stromen naar binnen. Aantal gebaseerd op Support.";
                                     spawnProtestants();
                                 }
                             } else {
@@ -235,7 +286,12 @@ export class VestraCityInside extends Scene {
             if (engine.input.keyboard.wasPressed(Keys.Q)) {
                 if (nearLever && !leverChoiceMade) {
                     leverChoiceMade = true;
-                    choiceText.text = "Je houdt de poort gesloten. Peace blijft hoger.";
+                    gateOpen = true;
+
+                    rightBorder.kill();
+
+                    choiceText.text = "Je houdt de poort gesloten. Peace blijft gelijk. Loop naar rechts.";
+                    updateStatsText();
                 }
             }
         });

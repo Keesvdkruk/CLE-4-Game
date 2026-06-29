@@ -1,136 +1,150 @@
 import { Color, Scene, Label, Font, FontUnit, Actor, Rectangle, TextAlign } from "excalibur";
-import { Game } from "../game";
+import { Resources } from "../resources.js";
+import { GameState } from "../state.js";
 
 export class StartScene extends Scene {
     onInitialize(engine) {
-        const overlay = new Actor({
+        const bg = new Actor({
+            x: engine.drawWidth / 2,
+            y: engine.drawHeight / 2
+        });
+
+        bg.graphics.use(Resources.StartScreen.toSprite());
+        this.add(bg);
+
+        const darkOverlay = new Actor({
             x: engine.drawWidth / 2,
             y: engine.drawHeight / 2,
             width: engine.drawWidth,
             height: engine.drawHeight
         });
-        overlay.graphics.use(new Rectangle({
+
+        darkOverlay.graphics.use(new Rectangle({
             width: engine.drawWidth,
             height: engine.drawHeight,
-            color: Color.fromRGB(0, 0, 0, 0.85)
+            color: Color.fromRGB(0, 0, 0, 0.35)
         }));
-        this.add(overlay);
 
-        // --- TITLE ---
-        const settingsLabel = new Label({
-            color: Color.White,
+        this.add(darkOverlay);
+
+        const title = new Label({
+            text: "STATE OF VESTRA",
             x: engine.drawWidth / 2,
-            y: engine.drawHeight / 6,
-            text: "State of Vestra",
-            font: new Font({
-                family: 'MijnPixelFont', 
-                size: 75,
-                unit: FontUnit.Px,
-                textAlign: TextAlign.Center // Vertelt Excalibur om dit perfect te centreren
-            })
-        });
-        this.add(settingsLabel);
-
-        // --- MENU ITEMS ---
-        // We verhogen de Y telkens met 60 pixels zodat ze mooi onder elkaar staan.
-        const baseY = engine.drawHeight / 2;
-
-        const southreachLabel = new Label({
+            y: 120,
             color: Color.White,
-            x: engine.drawWidth / 2,
-            y: baseY, 
-            text: "Southreach",
             font: new Font({
-                family: 'MijnPixelFont', 
-                size: 50, 
+                family: "MijnPixelFont",
+                size: 78,
                 unit: FontUnit.Px,
                 textAlign: TextAlign.Center
             })
         });
-        this.add(southreachLabel);
 
-        const ironvaleLabel = new Label({
-            color: Color.White,
+        this.add(title);
+
+        const subtitle = new Label({
+            text: "Een stad onder controle. Een volk op het randje.",
             x: engine.drawWidth / 2,
-            y: baseY + 60,
-            text: "Ironvale",
+            y: 220,
+            color: Color.White,
             font: new Font({
-                family: 'MijnPixelFont', 
-                size: 50, 
+                family: "MijnPixelFont",
+                size: 28,
                 unit: FontUnit.Px,
                 textAlign: TextAlign.Center
             })
         });
-        this.add(ironvaleLabel);
 
-        const ironvaleFactoryLabel = new Label({
-            color: Color.White,
+        this.add(subtitle);
+
+        const startLabel = new Label({
+            text: "START GAME",
             x: engine.drawWidth / 2,
-            y: baseY + 120,
-            text: "Ironvale Factory",
+            y: 390,
+            color: Color.White,
             font: new Font({
-                family: 'MijnPixelFont', 
-                size: 50, 
+                family: "MijnPixelFont",
+                size: 54,
                 unit: FontUnit.Px,
                 textAlign: TextAlign.Center
             })
         });
-        this.add(ironvaleFactoryLabel);
 
-        const eastwatchLabel = new Label({
-            color: Color.White,
+        this.add(startLabel);
+
+        const resetLabel = new Label({
+            text: "RESET SAVE",
             x: engine.drawWidth / 2,
-            y: baseY + 180,
-            text: "Eastwatch",
-            font: new Font({
-                family: 'MijnPixelFont', 
-                size: 50, 
-                unit: FontUnit.Px,
-                textAlign: TextAlign.Center
-            })
-        });
-        this.add(eastwatchLabel);
-        
-        const vestraCityLabel = new Label({
+            y: 460,
             color: Color.Red,
-            x: engine.drawWidth / 2,
-            y: baseY + 240,
-            text: "Vestra City",
             font: new Font({
-                family: 'MijnPixelFont', 
-                size: 50, 
+                family: "MijnPixelFont",
+                size: 38,
                 unit: FontUnit.Px,
                 textAlign: TextAlign.Center
             })
         });
-        this.add(vestraCityLabel);
 
-        // --- MUIS CURSOR LOGICA ---
-        southreachLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
-        southreachLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+        this.add(resetLabel);
 
-        ironvaleLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
-        ironvaleLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+        const resetFeedback = new Label({
+            text: "",
+            x: engine.drawWidth / 2,
+            y: 515,
+            color: Color.White,
+            font: new Font({
+                family: "MijnPixelFont",
+                size: 24,
+                unit: FontUnit.Px,
+                textAlign: TextAlign.Center
+            })
+        });
 
-        ironvaleFactoryLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
-        ironvaleFactoryLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+        this.add(resetFeedback);
 
-        eastwatchLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
-        eastwatchLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+        const infoLabel = new Label({
+            text: "Peace en Support bepalen hoe Vestra eindigt.",
+            x: engine.drawWidth / 2,
+            y: 600,
+            color: Color.White,
+            font: new Font({
+                family: "MijnPixelFont",
+                size: 24,
+                unit: FontUnit.Px,
+                textAlign: TextAlign.Center
+            })
+        });
 
-        vestraCityLabel.on("pointerenter", () => engine.canvas.style.cursor = 'pointer');
-        vestraCityLabel.on("pointerleave", () => engine.canvas.style.cursor = 'default');
+        this.add(infoLabel);
 
-        // --- KLIK LOGICA ---
-        southreachLabel.on("pointerdown", () => this.handleClick("southreach"));
-        ironvaleLabel.on("pointerdown", () => this.handleClick("ironvale"));
-        ironvaleFactoryLabel.on("pointerdown", () => this.handleClick("ironvalefactory"));
-        eastwatchLabel.on("pointerdown", () => this.handleClick("eastwatch"));
-        vestraCityLabel.on("pointerdown", () => this.handleClick("vestracity"));
-    }
+        startLabel.on("pointerenter", () => {
+            engine.canvas.style.cursor = "pointer";
+            startLabel.color = Color.Yellow;
+        });
 
-    handleClick(scene) {
-        this.engine.canvas.style.cursor = 'default';
-        this.engine.goToScene(scene);
+        startLabel.on("pointerleave", () => {
+            engine.canvas.style.cursor = "default";
+            startLabel.color = Color.White;
+        });
+
+        resetLabel.on("pointerenter", () => {
+            engine.canvas.style.cursor = "pointer";
+            resetLabel.color = Color.White;
+        });
+
+        resetLabel.on("pointerleave", () => {
+            engine.canvas.style.cursor = "default";
+            resetLabel.color = Color.Red;
+        });
+
+        startLabel.on("pointerdown", () => {
+            engine.canvas.style.cursor = "default";
+            engine.goToScene("square");
+        });
+
+        resetLabel.on("pointerdown", () => {
+            GameState.resetAll();
+            resetFeedback.text = "Save gereset: Peace 100 | Support 0";
+        });
     }
 }

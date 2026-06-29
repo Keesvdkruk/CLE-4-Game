@@ -1,6 +1,9 @@
-import { ImageSource, FontSource, Loader } from 'excalibur'
+import { ImageSource, FontSource, Loader, Sound, SpriteSheet } from 'excalibur'
 
 export const Resources = {
+
+    //UI 
+    UiSpriteSheet: new ImageSource('/UI/bars.png'),
 
     // Player Sprites
     Idle: new ImageSource('/player/Idle.png'),
@@ -20,8 +23,9 @@ export const Resources = {
     //HomelessNpc
     Npc1Idle1: new ImageSource('/Homeless_1/Idle.png'),
     Npc1Idle2: new ImageSource('/Homeless_1/Idle_2.png'),
- 
+
     //Kees:
+    BgSouthreach1: new ImageSource('/southreach/southreach1.png'),
     BgSouthreach: new ImageSource('/southreach/Night/1.png'),
     BgSouthreach2: new ImageSource('/southreach/Night/2.png'),
     BgSouthreach3: new ImageSource('/southreach/Night/3.png'),
@@ -38,17 +42,20 @@ export const Resources = {
     BgFactory2: new ImageSource('/ironvale/factory2.png'),
     BgFactory3: new ImageSource('/ironvale/factory3.png'),
 
+    IronvaleIntro: new ImageSource('/ironvale/ironvale.png'),
+
+
     //Efe:
     EastwatchOutside: new ImageSource('/eastwatch/eastwatchoutside.png'),
     EastwatchInside: new ImageSource('/eastwatch/eastwatchinside.png'),
 
     // Objects
     Platform: new ImageSource('/images/Platform.png'),
-    
+
     // Posters
     IronvalePoster: new ImageSource('/posters/ironvalePoster.png'),
     PropagandaPoster: new ImageSource('/posters/propagandaPoster.png'),
-    
+
     // Fonts
     PixelFont: new FontSource('/fonts/pixel.ttf', 'MijnPixelFont'),
 
@@ -68,8 +75,27 @@ export const Resources = {
     CityRoad_2: new ImageSource('/images/CityRoad_2.png'),
     CityRoad_3: new ImageSource('/images/CityRoad_3.png'),
     Bullet: new ImageSource('/images/bullet.png'),
-   SquareBackground: new ImageSource("/images/square_background.png"),
-   SquareBroken: new ImageSource("/images/Square_Broken.png"),
+    SquareBackground: new ImageSource("/images/square_background.png"),
+    SquareBroken: new ImageSource("/images/Square_Broken.png"),
+    Npc_1: new ImageSource("/images/Npc_1.png"),
+    Npc_2: new ImageSource("/images/Npc_2.png"),
+    President: new ImageSource("/images/President.png"),
+   President_kneel: new ImageSource("/images/President_kneel.png"),
+   EndScreen: new ImageSource("/images/Endscreen.png"),
+   StartScreen: new ImageSource("/images/StartScreen.png"),
+   Gunshot: new Sound("/Sounds/Gunshot.wav"),
+
 }
 
+export const UiSpriteSheet = SpriteSheet.fromImageSource({
+    image: Resources.UiSpriteSheet, 
+    grid: {
+        rows: 6,       
+        columns: 5,    
+        spriteWidth: 48, 
+        spriteHeight: 16 
+    }
+})
+
 export const ResourceLoader = new Loader(Object.values(Resources))
+ResourceLoader.suppressPlayButton = true

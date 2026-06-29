@@ -1,6 +1,7 @@
 import { Actor, CollisionType, Color, Font, FontUnit, Keys, Label, Rectangle, Vector } from "excalibur"
 import { Resources } from "./resources.js"
 import { Player } from "./player.js"
+import { GameState } from "./state.js"
 
 export class Poster extends Actor {
     constructor(x, y) {
@@ -82,6 +83,11 @@ export class Poster extends Actor {
 
             if (holdDuration >= 3000) {
                 console.log("Poster vernietigd!")
+                
+                // Haal 1 punt van de peace stat af (zorg dat hij niet onder de 0 zakt)
+                GameState.peace = Math.max(0, GameState.peace - 1)
+                console.log("Huidige Peace stat:", GameState.peace)
+
                 this.setPlayerDestroying(false)
                 this.destroyProgressBar()
                 this.kill() 

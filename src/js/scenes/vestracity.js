@@ -1,6 +1,7 @@
 import { Scene, Label, Font, Color, Actor, Timer, CollisionType, Vector, Keys } from "excalibur";
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
+import { HUD } from "../HUD.js";
 
 export class VestraCity extends Scene {
     onInitialize(engine) {
@@ -36,6 +37,9 @@ export class VestraCity extends Scene {
         });
 
         this.add(title);
+
+        const hud = new HUD();
+        this.add(hud);
 
         const year = new Label({
             text: "",
@@ -111,7 +115,7 @@ export class VestraCity extends Scene {
 
             const objective = new Label({
                 text: "Objective: word niet gezien en sluip naar binnen.",
-                x: 40,
+                x: 340,
                 y: 40,
                 color: Color.White,
                 font: new Font({
@@ -131,7 +135,27 @@ export class VestraCity extends Scene {
             });
 
             this.add(ground);
+            const leftBorder = new Actor({
+                x: -25,
+                y: engine.drawHeight / 2,
+                width: 50,
+                height: engine.drawHeight,
+                collisionType: CollisionType.Fixed
+            });
 
+            leftBorder.graphics.opacity = 0;
+            this.add(leftBorder);
+
+            const rightBorder = new Actor({
+                x: engine.drawWidth + 25,
+                y: engine.drawHeight / 2,
+                width: 50,
+                height: engine.drawHeight,
+                collisionType: CollisionType.Fixed
+            });
+
+            rightBorder.graphics.opacity = 0;
+            this.add(rightBorder);
 
 
             const keycard = new Actor({
@@ -194,6 +218,7 @@ export class VestraCity extends Scene {
             const vision = new Actor({
                 x: 1190,
                 y: 570,
+                z: 10,
                 collisionType: CollisionType.Passive
             });
 
@@ -326,7 +351,7 @@ export class VestraCity extends Scene {
             this.on("preupdate", () => {
                 if (nearDoor && hasKeycard && engine.input.keyboard.wasPressed(Keys.E)) {
                     engine.goToScene("vestracityinside");
-                     console.log("E ingedrukt");
+                    console.log("E ingedrukt");
                 }
             });
         };
