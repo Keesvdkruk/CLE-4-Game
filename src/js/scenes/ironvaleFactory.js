@@ -1,57 +1,90 @@
-import { Actor, Color, CollisionType, Axis, BoundingBox, Scene } from "excalibur"
-import { Drone } from "../drone"
-import { Ground } from "../ground"
-import { Platform } from "../platform"
+import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, Vector } from "excalibur"
 import { Player } from "../player"
-import { Poster } from "../poster"
 import { Background } from "../background"
 import { Resources } from "../resources"
 import { ironvaleGround } from "../ironvaleGround"
 import { ironvalePlatform } from "../ironvalePlatform"
+import { ironvalePoster } from "../ironvalePoster"
+import { IronvaleDrone } from "../ironvaleDrone"
+import { IronvaleDrone2 } from "../ironvaleDrone2"
+import { Prisoner } from "../prisoner"
 
 export class IronvaleFactory extends Scene {
 
     onInitialize(engine) {
-        this.add(new Background(Resources.BgIronvale, 0.05, -104))
-        this.add(new Background(Resources.BgFactory1, 0.2, -103))
-        this.add(new Background(Resources.BgFactory2, 0.4, -102))
-        this.add(new Background(Resources.BgFactory3, 0.6, -101))
+        const factoryBg = new Actor({
+            x: 0,
+            y: 0,
+        })
+        factoryBg.z = -10
+        factoryBg.anchor = new Vector(0, 0)
+        factoryBg.graphics.use(Resources.BgFactory.toSprite())
+
+        this.add(factoryBg)
 
         const ground = new ironvaleGround()
         this.add(ground)
 
-        const leftWall = new Actor({
+        // Level Borders
+        const leftBorder = new Actor({
             x: -25,
             y: 360,
             width: 50,
             height: 720,
-            color: Color.Transparent,
             collisionType: CollisionType.Fixed
         })
-        this.add(leftWall)
+        this.add(leftBorder)
 
-        this.add(new Poster(500, 620))
-        this.add(new Poster(1200, 620))
-        this.add(new Poster(2500, 620))
-        this.add(new Poster(1400, 220))
+        const rightBorder = new Actor({
+            x: 1770,
+            y: 360,
+            width: 40,
+            height: 720,
+            collisionType: CollisionType.Fixed
+        });
 
-        this.add(new ironvalePlatform(600, 550, 350, 30))
-        this.add(new ironvalePlatform(1000, 440, 350, 30))
-        this.add(new ironvalePlatform(1200, 280, 450, 30))
+        this.add(rightBorder);
 
-        this.add(new Drone(700, 660))
-        this.add(new Drone(1300, 260))
+        // Platform Opstelling
+        this.add(new ironvalePlatform(0, 280, 355, 30))
+        this.add(new ironvalePlatform(355, 470, 265, 30))
+        this.add(new ironvalePlatform(470, 640, 270, 30))
+        this.add(new ironvalePlatform(530, 310, 180, 30))
+        this.add(new ironvalePlatform(655, 540, 320, 30))
+        this.add(new ironvalePlatform(850, 320, 340, 30))
+        this.add(new ironvalePlatform(1000, 640, 180, 30))
+        this.add(new ironvalePlatform(1150, 440, 80, 30))
+        this.add(new ironvalePlatform(1340, 540, 400, 30))
+        this.add(new ironvalePlatform(1250, 250, 500, 30))
 
+        // Drones
+        this.add(new IronvaleDrone(200, 100))
+        this.add(new IronvaleDrone(700, 330))
+
+        // Prisoners
+        const prisoner1 = new Prisoner(170, 200)
+        const prisoner2 = new Prisoner(1350, 165)
+        const prisoner3 = new Prisoner(800, 470)
+
+        prisoner1.onFreed = () => {
+            console.log("Prisoner freed!")
+        }
+
+        this.add(prisoner1)
+        this.add(prisoner2)
+        this.add(prisoner3)
+
+        // Player
         const player = new Player()
         this.add(player)
 
+        // Camera
         this.camera.strategy.lockToActorAxis(player, Axis.X)
         this.camera.strategy.limitCameraBounds(new BoundingBox({
             left: 0,
             top: 0,
-            right: 4000,
+            right: 1770,
             bottom: 720
         }))
-
     }
 }

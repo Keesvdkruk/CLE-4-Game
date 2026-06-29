@@ -8,7 +8,8 @@ export class ironvalePlatform extends Actor {
             width: width,
             height: height,
             anchor: new Vector(0, 0),
-            color: Color.Brown
+            color: Color.White,
+            opacity: 0
         });
     }
 
