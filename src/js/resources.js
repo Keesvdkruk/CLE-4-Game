@@ -100,3 +100,4 @@ export const UiSpriteSheet = SpriteSheet.fromImageSource({
 })
 
 export const ResourceLoader = new Loader(Object.values(Resources))
+ResourceLoader.suppressPlayButton = true
