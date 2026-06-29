@@ -4,10 +4,9 @@ export class Ground extends Actor {
     constructor() {
         super({
             x: 2000,
-            y: 700,           
+            y: 650,           
             width: 4000,
             height: 40,
-            color: Color.Black,
             collisionType: CollisionType.Fixed 
         })
         

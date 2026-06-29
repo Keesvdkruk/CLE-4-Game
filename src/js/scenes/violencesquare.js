@@ -1,15 +1,12 @@
 import { Scene, Actor, CollisionType, Label, Font, Color, Keys, Timer, SpriteSheet, Animation, range } from "excalibur";
-
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
 import { RoadToSquare } from "./roadtosquare.js";
 import { Npc_1 } from "../npc_1.js";
 import { Npc_2 } from "../npc_2.js";
-import { PeacefulRoadToSquare } from "./peacefulroadtosquare.js";
 import { HUD } from "../HUD.js";
 
-
-export class Square extends Scene {
+export class ViolenceSquare extends Scene {
     onInitialize(engine) {
         this.backgroundColor = Color.Black;
 
@@ -153,16 +150,6 @@ export class Square extends Scene {
 
         leaderWalk.loop = true;
 
-        const kneelSheet = SpriteSheet.fromImageSource({
-            image: Resources.President_kneel,
-            grid: {
-                rows: 1,
-                columns: 8,
-                spriteWidth: 192,
-                spriteHeight: 1024
-            }
-        });
-
         const showEndScreen = () => {
             objective.kill();
 
@@ -210,8 +197,8 @@ export class Square extends Scene {
             this.add(title);
 
             const subtitle = new Label({
-                text: "Het volk heeft gewonnen. Een nieuw hoofdstuk begint.",
-                x: engine.drawWidth / 2 - 330,
+                text: "Het regime is gevallen, maar de prijs was hoog.",
+                x: engine.drawWidth / 2 - 310,
                 y: 60,
                 color: Color.Black,
                 font: new Font({
@@ -253,6 +240,78 @@ export class Square extends Scene {
             fadeTimer.start();
         };
 
+        const panicCrowd = () => {
+            for (let i = 0; i < 14; i++) {
+                const x = -80 - i * 45;
+                const y = 610 + (Math.random() * 35 - 15);
+
+                const NpcClass = Math.random() < 0.5 ? Npc_1 : Npc_2;
+                const npc = new NpcClass(x, y, true);
+
+                npc.scale.setTo(0.23, 0.23);
+                npc.vel.x = 420 + Math.random() * 160;
+                npc.z = y;
+
+                this.add(npc);
+            }
+        };
+
+        const shootPresident = (leader) => {
+            objective.text = "De menigte kiest wraak...";
+
+            const fade = new Actor({
+                x: engine.drawWidth / 2,
+                y: engine.drawHeight / 2,
+                width: engine.drawWidth,
+                height: engine.drawHeight,
+                color: Color.Black
+            });
+
+            fade.z = 9999;
+            fade.graphics.opacity = 0;
+            this.add(fade);
+
+            let gunshotPlayed = false;
+
+            const fadeTimer = new Timer({
+                interval: 40,
+                repeats: true,
+                fcn: () => {
+                    fade.graphics.opacity += 0.01;
+
+                    if (fade.graphics.opacity >= 0.55 && !gunshotPlayed) {
+                        gunshotPlayed = true;
+
+                        Resources.Gunshot.play();
+                        panicCrowd();
+
+                        leader.graphics.opacity = 0;
+                        objective.text = "";
+                        this.camera.shake(14, 14, 800);
+                    }
+
+                    if (fade.graphics.opacity >= 1) {
+                        fade.graphics.opacity = 1;
+                        fadeTimer.cancel();
+
+                        const waitTimer = new Timer({
+                            interval: 1200,
+                            repeats: false,
+                            fcn: () => {
+                                showEndScreen();
+                            }
+                        });
+
+                        this.add(waitTimer);
+                        waitTimer.start();
+                    }
+                }
+            });
+
+            this.add(fadeTimer);
+            fadeTimer.start();
+        };
+
         const spawnLeader = () => {
             objective.text = "De leider van Vestra komt naar buiten...";
 
@@ -277,32 +336,8 @@ export class Square extends Scene {
                     leader.graphics.use(leaderSheet.getSprite(5, 0));
                     leader.scale.setTo(-0.38, 0.38);
 
-                    objective.text = "De leider stopt...";
-
-                    const kneelWaitTimer = new Timer({
-                        interval: 2000,
-                        repeats: false,
-                        fcn: () => {
-                            leader.graphics.use(kneelSheet.getSprite(7, 0));
-                            leader.scale.setTo(-0.38, 0.38);
-
-                            objective.text = "De regering geeft zich over.";
-
-                            const endWaitTimer = new Timer({
-                                interval: 4000,
-                                repeats: false,
-                                fcn: () => {
-                                    showEndScreen();
-                                }
-                            });
-
-                            this.add(endWaitTimer);
-                            endWaitTimer.start();
-                        }
-                    });
-
-                    this.add(kneelWaitTimer);
-                    kneelWaitTimer.start();
+                    objective.text = "De president stopt voor de woedende menigte...";
+                    shootPresident(leader);
 
                     leader.off("preupdate");
                 }
@@ -430,15 +465,9 @@ export class Square extends Scene {
             }
 
             if (engine.input.keyboard.wasPressed(Keys.R)) {
-                const scene = engine.lastScene || "roadtosquare";
-                const resetSceneName = scene + "_" + Date.now();
+                const resetSceneName = "roadtosquare_" + Date.now();
 
-                if (scene === "peacefulroadtosquare") {
-                    engine.addScene(resetSceneName, new PeacefulRoadToSquare());
-                } else {
-                    engine.addScene(resetSceneName, new RoadToSquare());
-                }
-
+                engine.addScene(resetSceneName, new RoadToSquare());
                 engine.goToScene(resetSceneName);
             }
         });
