@@ -74,7 +74,7 @@ export class Ironvale extends Scene {
         this.add(subtitle)
 
         const fullTitle = "IRONVALE"
-        const fullSubtitle = "THE HEART OF INDUSTRIAL PRODUCTION..."
+        const fullSubtitle = "HET HART VAN DE INDUSTRIËLE PRODUCTIE..."
 
         let titleIndex = 0
         let subtitleIndex = 0
@@ -113,7 +113,7 @@ export class Ironvale extends Scene {
         const startLevel = () => {
             // Objective
             this.objective = new Label({
-                text: "Gain information from workers (0/3)",
+                text: "Haal informatie op bij arbeiders (0/3)",
                 x: 40,
                 y: 40,
                 color: Color.White,
@@ -157,9 +157,11 @@ export class Ironvale extends Scene {
 
             // Platform Opstelling
             this.add(new ironvalePlatform(0, 440, 240, 20))
+
             this.add(new ironvalePlatform(0, 660, 620, 20))
 
             this.add(new ironvalePlatform(270, 440, 160, 20))
+
             this.add(new ironvalePlatform(400, 530, 130, 20))
 
             this.add(new ironvalePlatform(580, 400, 230, 20))
@@ -220,19 +222,19 @@ export class Ironvale extends Scene {
             const worker1 = new WorkerNpc(
                 870,
                 310,
-                "We work 14 hours a day for low wages..."
+                "We werken 14 uur per dag voor lage lonen..."
             )
 
             const worker2 = new WorkerNpc(
                 1730,
                 680,
-                "Complaints are immediately discarded..."
+                "Er wordt niet geluisterd naar onze klachten..."
             )
 
             const worker3 = new WorkerNpc(
                 2100,
                 290,
-                "The government protects only the factory owners..."
+                "De regering beschermt alleen de fabriekseigenaren..."
             )
 
             worker1.setPlayer(player)
@@ -292,14 +294,18 @@ export class Ironvale extends Scene {
         if (this.workersSpoken >= 3) {
             this.canLeave = true
             this.objective.text =
-                "Gained all information, continue to the factory site"
+                "Alle informatie verzameld, ga de fabriek binnen."
         }
     }
 
     restartLevel() {
+
+        this.workersSpoken = 0
+        this.canLeave = false
+
         this.clear()
         this.camera.clearAllStrategies()
-        this.onInitialize(this.engine)
 
+        this.onInitialize(this.engine)
     }
 }
