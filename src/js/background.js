@@ -4,7 +4,7 @@ export class Background extends Actor {
     constructor(imageSource, parallaxSpeed, zIndex) {
         super({
             x: 0,       
-            y: -400,       
+            y: -360,       
             z: zIndex,
             anchor: Vector.Zero 
         })

@@ -1,6 +1,9 @@
-import { ImageSource, FontSource, Loader, Sound } from 'excalibur'
+import { ImageSource, FontSource, Loader, Sound, SpriteSheet } from 'excalibur'
 
 export const Resources = {
+
+    //UI 
+    UiSpriteSheet: new ImageSource('/UI/bars.png'),
 
     // Player Sprites
     Idle: new ImageSource('/player/Idle.png'),
@@ -22,6 +25,7 @@ export const Resources = {
     Npc1Idle2: new ImageSource('/Homeless_1/Idle_2.png'),
 
     //Kees:
+    BgSouthreach1: new ImageSource('/southreach/southreach1.png'),
     BgSouthreach: new ImageSource('/southreach/Night/1.png'),
     BgSouthreach2: new ImageSource('/southreach/Night/2.png'),
     BgSouthreach3: new ImageSource('/southreach/Night/3.png'),
@@ -84,5 +88,15 @@ export const Resources = {
    Gunshot: new Sound("/Sounds/Gunshot.wav"),
 
 }
+
+export const UiSpriteSheet = SpriteSheet.fromImageSource({
+    image: Resources.UiSpriteSheet, 
+    grid: {
+        rows: 6,       
+        columns: 5,    
+        spriteWidth: 48, 
+        spriteHeight: 16 
+    }
+})
 
 export const ResourceLoader = new Loader(Object.values(Resources))
