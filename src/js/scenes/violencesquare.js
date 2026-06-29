@@ -4,6 +4,7 @@ import { Player } from "../player.js";
 import { RoadToSquare } from "./roadtosquare.js";
 import { Npc_1 } from "../npc_1.js";
 import { Npc_2 } from "../npc_2.js";
+import { HUD } from "../HUD.js";
 
 export class ViolenceSquare extends Scene {
     onInitialize(engine) {
@@ -27,6 +28,9 @@ export class ViolenceSquare extends Scene {
 
         ground.graphics.opacity = 0;
         this.add(ground);
+
+        const hud = new HUD();
+        this.add(hud);
 
         const leftBorder = new Actor({
             x: -25,
@@ -61,7 +65,7 @@ export class ViolenceSquare extends Scene {
 
         const objective = new Label({
             text: "",
-            x: 40,
+            x: 440,
             y: 40,
             color: Color.White,
             font: new Font({

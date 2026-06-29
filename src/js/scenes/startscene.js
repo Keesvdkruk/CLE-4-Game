@@ -139,7 +139,7 @@ export class StartScene extends Scene {
 
         startLabel.on("pointerdown", () => {
             engine.canvas.style.cursor = "default";
-            engine.goToScene("roadtosquare");
+            engine.goToScene("square");
         });
 
         resetLabel.on("pointerdown", () => {

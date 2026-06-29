@@ -1,6 +1,7 @@
 import { Scene, Actor, CollisionType, Label, Font, Color, Timer, Keys, } from "excalibur";
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
+import { HUD } from "../HUD.js";
 
 
 export class RoadToSquare extends Scene {
@@ -33,6 +34,10 @@ export class RoadToSquare extends Scene {
 
         ground.graphics.opacity = 0;
         this.add(ground);
+
+
+        const hud = new HUD();
+        this.add(hud);
 
         const leftBorder = new Actor({
             x: -25,

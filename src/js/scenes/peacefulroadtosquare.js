@@ -1,6 +1,7 @@
 import { Scene, Actor, CollisionType, Label, Font, Color, Timer, Keys } from "excalibur";
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
+import { HUD } from "../HUD.js";
 
 export class PeacefulRoadToSquare extends Scene {
     onInitialize(engine) {
@@ -54,6 +55,9 @@ export class PeacefulRoadToSquare extends Scene {
 
         this.add(objective);
 
+        const hud = new HUD();
+        this.add(hud);
+
         const timeText = new Label({
             text: "Time: 0.00",
             x: 40,
@@ -83,7 +87,7 @@ export class PeacefulRoadToSquare extends Scene {
         const bestComboText = new Label({
             text: savedBestCombo === null ? "Best Combo: --" : "Best Combo: " + savedBestCombo,
             x: 40,
-            y: 130,
+            y: 340,
             color: Color.White,
             font: new Font({
                 family: "Upheaval",
@@ -96,7 +100,7 @@ export class PeacefulRoadToSquare extends Scene {
         const scoreText = new Label({
             text: savedBestScore === null ? "Best Score: --" : "Best Score: " + savedBestScore,
             x: 40,
-            y: 160,
+            y: 340,
             color: Color.White,
             font: new Font({
                 family: "Upheaval",
@@ -351,19 +355,19 @@ export class PeacefulRoadToSquare extends Scene {
                 this.camera.pos.x = levelWidth - engine.drawWidth / 2;
             }
 
-            objective.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            objective.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 240;
             objective.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 40;
 
-            timeText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            timeText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 1040;
             timeText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 70;
 
-            comboText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            comboText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 1040;
             comboText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 100;
 
-            bestComboText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            bestComboText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 1040;
             bestComboText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 130;
 
-            scoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            scoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 1040;
             scoreText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 160;
 
             retryText.pos.x = this.camera.pos.x + engine.drawWidth / 2 - 360;

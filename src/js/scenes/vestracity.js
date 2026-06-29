@@ -1,6 +1,7 @@
 import { Scene, Label, Font, Color, Actor, Timer, CollisionType, Vector, Keys } from "excalibur";
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
+import { HUD } from "../HUD.js";
 
 export class VestraCity extends Scene {
     onInitialize(engine) {
@@ -36,6 +37,9 @@ export class VestraCity extends Scene {
         });
 
         this.add(title);
+
+        const hud = new HUD();
+        this.add(hud);
 
         const year = new Label({
             text: "",
@@ -111,7 +115,7 @@ export class VestraCity extends Scene {
 
             const objective = new Label({
                 text: "Objective: word niet gezien en sluip naar binnen.",
-                x: 40,
+                x: 340,
                 y: 40,
                 color: Color.White,
                 font: new Font({

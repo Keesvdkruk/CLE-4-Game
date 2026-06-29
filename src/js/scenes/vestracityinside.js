@@ -4,6 +4,7 @@ import { Player } from "../player.js";
 import { Npc_1 } from "../npc_1.js";
 import { Npc_2 } from "../npc_2.js";
 import { GameState } from "../state.js";
+import { HUD } from "../HUD.js";
 
 export class VestraCityInside extends Scene {
     onInitialize(engine) {
@@ -24,6 +25,9 @@ export class VestraCityInside extends Scene {
         });
 
         this.add(ground);
+
+        const hud = new HUD();
+        this.add(hud);
 
         const leftBorder = new Actor({
             x: -25,
@@ -71,22 +75,9 @@ export class VestraCityInside extends Scene {
 
         this.add(choiceText);
 
-        const statsText = new Label({
-            text: "Peace: " + GameState.peace + "   Support: " + GameState.support,
-            x: 40,
-            y: 40,
-            color: Color.White,
-            font: new Font({
-                family: "Upheaval",
-                size: 22
-            })
-        });
 
-        this.add(statsText);
+        
 
-        const updateStatsText = () => {
-            statsText.text = "Peace: " + GameState.peace + "   Support: " + GameState.support;
-        };
 
         const getRebelAmount = () => {
             return Math.max(4, Math.floor(GameState.support / 5));
@@ -241,7 +232,7 @@ export class VestraCityInside extends Scene {
                         GameState.peace = 0;
                     }
 
-                    updateStatsText();
+                   
 
                     rightBorder.kill();
 
@@ -292,17 +283,17 @@ export class VestraCityInside extends Scene {
                 }
             }
 
-        if (engine.input.keyboard.wasPressed(Keys.Q)) {
-    if (nearLever && !leverChoiceMade) {
-        leverChoiceMade = true;
-        gateOpen = true;
+            if (engine.input.keyboard.wasPressed(Keys.Q)) {
+                if (nearLever && !leverChoiceMade) {
+                    leverChoiceMade = true;
+                    gateOpen = true;
 
-        rightBorder.kill();
+                    rightBorder.kill();
 
-        choiceText.text = "Je houdt de poort gesloten. Peace blijft gelijk. Loop naar rechts.";
-        updateStatsText();
-    }
-}
+                    choiceText.text = "Je houdt de poort gesloten. Peace blijft gelijk. Loop naar rechts.";
+                    updateStatsText();
+                }
+            }
         });
     }
 }

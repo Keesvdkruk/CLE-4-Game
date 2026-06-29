@@ -6,6 +6,7 @@ import { RoadToSquare } from "./roadtosquare.js";
 import { Npc_1 } from "../npc_1.js";
 import { Npc_2 } from "../npc_2.js";
 import { PeacefulRoadToSquare } from "./peacefulroadtosquare.js";
+import { HUD } from "../HUD.js";
 
 
 export class Square extends Scene {
@@ -30,6 +31,9 @@ export class Square extends Scene {
 
         ground.graphics.opacity = 0;
         this.add(ground);
+
+        const hud = new HUD();
+        this.add(hud);
 
         const leftBorder = new Actor({
             x: -25,
@@ -64,7 +68,7 @@ export class Square extends Scene {
 
         const objective = new Label({
             text: "",
-            x: 40,
+            x: 440,
             y: 40,
             color: Color.White,
             font: new Font({
@@ -413,28 +417,30 @@ export class Square extends Scene {
             waitTimer.start();
         };
 
-    this.on("preupdate", () => {
-    this.camera.pos.x = engine.drawWidth / 2;
-    this.camera.pos.y = engine.drawHeight / 2;
+        this.on("preupdate", () => {
+            this.camera.pos.x = engine.drawWidth / 2;
+            this.camera.pos.y = engine.drawHeight / 2;
 
-    if (
-        nearStatue &&
-        !statueDestroyed &&
-        engine.input.keyboard.wasPressed(Keys.E)
-    ) {
-        destroyStatue();
+            if (
+                nearStatue &&
+                !statueDestroyed &&
+                engine.input.keyboard.wasPressed(Keys.E)
+            ) {
+                destroyStatue();
+            }
+
+            if (engine.input.keyboard.wasPressed(Keys.R)) {
+                const scene = engine.lastScene || "roadtosquare";
+                const resetSceneName = scene + "_" + Date.now();
+
+                if (scene === "peacefulroadtosquare") {
+                    engine.addScene(resetSceneName, new PeacefulRoadToSquare());
+                } else {
+                    engine.addScene(resetSceneName, new RoadToSquare());
+                }
+
+                engine.goToScene(resetSceneName);
+            }
+        });
     }
-
-    if (engine.input.keyboard.wasPressed(Keys.R)) {
-        const scene = engine.lastScene || "roadtosquare";
-        const resetSceneName = scene + "_" + Date.now();
-
-        if (scene === "peacefulroadtosquare") {
-            engine.addScene(resetSceneName, new PeacefulRoadToSquare());
-        } else {
-            engine.addScene(resetSceneName, new RoadToSquare());
-        }
-
-        engine.goToScene(resetSceneName);
-    }
-});}}
+}
