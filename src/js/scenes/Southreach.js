@@ -1,4 +1,4 @@
-import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, ScreenElement, Label, Font, FontUnit } from "excalibur"
+import { Actor, Color, CollisionType, Axis, BoundingBox, Scene } from "excalibur"
 import { Drone } from "../drone"
 import { Ground } from "../ground"
 import { Platform } from "../platform"
@@ -10,17 +10,18 @@ import { Resources } from "../resources"
 import { ChoiceNpc } from "../choicenpc"
 import { GameState } from "../state.js" 
 
+// NIEUW: Importeer alleen nog maar het HUD component!
+import { HUD } from "../hud.js" 
+
 export class Southreach extends Scene {
 
     onActivate(context) {
-        // Slaat zowel peace als support op als checkpoint
         GameState.saveCheckpoint();
     }
 
     onInitialize(engine) {
         this.engine = engine
 
-        // --- PARALLAX ACHTERGRONDEN ---
         this.add(new Background(Resources.BgSouthreach, 0.05, -104))
         this.add(new Background(Resources.BgSouthreach2, 0.2, -103))
         this.add(new Background(Resources.BgSouthreach3, 0.4, -102))
@@ -40,13 +41,12 @@ export class Southreach extends Scene {
         })
         this.add(leftWall)
 
-        // --- DE SPELER ---
         const player = new Player()
         player.onKnockoutComplete = () => this.restartLevel()
         this.add(player)
 
         // ==========================================
-        // ZONE 1: De Veilige Start 
+        // ZONES
         // ==========================================
         this.add(new Poster(400, 620))
         
@@ -54,9 +54,6 @@ export class Southreach extends Scene {
         choiceNpc.setPlayer(player)
         this.add(choiceNpc)
 
-        // ==========================================
-        // ZONE 2: De Eerste Blokkade
-        // ==========================================
         this.add(new Drone(800, 630)) 
         
         this.add(new Platform(1100, 600, 40, 240)) 
@@ -67,9 +64,6 @@ export class Southreach extends Scene {
         trader.setPlayer(player)
         this.add(trader)
 
-        // ==========================================
-        // ZONE 3: De Toren
-        // ==========================================
         this.add(new Poster(1400, 620))
         this.add(new Drone(1500, 630))
         
@@ -80,63 +74,23 @@ export class Southreach extends Scene {
         this.add(new Poster(1700, 200)) 
         this.add(new Drone(1950, 360)) 
 
-        // ==========================================
-        // ZONE 4: Drone Alley 
-        // ==========================================
         this.add(new Platform(2300, 600, 40, 240)) 
-        
         this.add(new Platform(2150, 520, 100, 20)) 
         this.add(new Platform(2450, 520, 100, 20))
-        
         this.add(new Poster(2600, 620))
         
         this.add(new Drone(2800, 630))
         this.add(new Drone(3100, 630))
         this.add(new Drone(3400, 630)) 
-
         this.add(new Poster(3600, 620))
 
-        // ==========================================
-        // HET EINDE VAN HET LEVEL
-        // ==========================================
         this.add(new Platform(3800, 360, 100, 720))
 
         // ==========================================
-        // UI LAAG VOOR DE STATS (Vast op het scherm)
+        // UI TOEVOEGEN
         // ==========================================
-        this.uiLayer = new ScreenElement({
-            x: 30,
-            y: 30,
-            z: 9999 
-        })
-
-        // 1. Het Peace Label
-        this.peaceLabel = new Label({
-            text: "Peace: " + GameState.peace + "%",
-            color: Color.White,
-            font: new Font({
-                family: 'MijnPixelFont', 
-                size: 30,
-                unit: FontUnit.Px
-            })
-        })
-        this.uiLayer.addChild(this.peaceLabel)
-
-        // 2. NIEUW: Het Support Label (y: 40 zorgt dat hij eronder staat)
-        this.supportLabel = new Label({
-            text: "Support: " + GameState.support,
-            color: Color.White,
-            x: 0,
-            y: 40, 
-            font: new Font({
-                family: 'MijnPixelFont', 
-                size: 30,
-                unit: FontUnit.Px
-            })
-        })
-        this.uiLayer.addChild(this.supportLabel)
-        
-        this.add(this.uiLayer)
+        // Al die tientallen regels UI code zijn nu vervangen door dit ene woord:
+        this.add(new HUD())
 
         // --- CAMERA SETTINGS ---
         this.camera.strategy.lockToActorAxis(player, Axis.X)
@@ -148,22 +102,8 @@ export class Southreach extends Scene {
         }))
     }
 
-    // Wordt elke frame uitgevoerd om de UI live bij te werken
-    onPreUpdate(engine, delta) {
-        if (this.peaceLabel) {
-            this.peaceLabel.text = "Peace: " + GameState.peace + "%"
-        }
-        
-        // NIEUW: Update ook de support tekst elke frame
-        if (this.supportLabel) {
-            this.supportLabel.text = "Support: " + GameState.support
-        }
-    }
-
     restartLevel() {
-        // Reset alle stats (Zowel peace als support vallen terug naar de level-start checkpoint)
         GameState.revertToCheckpoint(); 
-
         this.clear()
         this.camera.clearAllStrategies()
         this.onInitialize(this.engine)
