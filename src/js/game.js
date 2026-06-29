@@ -5,7 +5,8 @@ import { ResourceLoader } from './resources.js'
 import { StartScene } from './scenes/startscene.js'
 import { Southreach } from './scenes/Southreach.js'
 import { Ironvale } from './scenes/ironvale.js'
-import { Eastwatch } from './scenes/Eastwatch.js'
+import { Eastwatch } from './scenes/eastwatch.js'
+import { EastwatchInside } from './scenes/EastwatchInside.js'
 import { IronvaleFactory } from './scenes/ironvaleFactory.js'
 import { VestraCity } from './scenes/vestracity.js'
 import { GameOver } from './scenes/gameover.js'
@@ -49,10 +50,9 @@ export class Game extends Engine {
         this.addScene("peacefulroadtosquare", new PeacefulRoadToSquare())
         this.addScene("square", new Square())
         this.addScene("violencesquare", new ViolenceSquare())
-        
 
-        this.lastScene = "start"
-        this.goToScene("start")
+        this.lastScene = "start";
+        this.goToScene("start");
     }
 }
 

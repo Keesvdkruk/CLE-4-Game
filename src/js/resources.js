@@ -46,10 +46,8 @@ export const Resources = {
 
 
     //Efe:
-    Eastwatch1: new ImageSource('/eastwatch/Eastwatch1.png'),
-    Eastwatch2: new ImageSource('/eastwatch/Eastwatch2.png'),
-    Eastwatch3: new ImageSource('/eastwatch/Eastwatch3.png'),
-    Eastwatch4: new ImageSource('/eastwatch/Eastwatch4.png'),
+    EastwatchOutside: new ImageSource('/eastwatch/eastwatchoutside.png'),
+    EastwatchInside: new ImageSource('/eastwatch/eastwatchinside.png'),
 
     // Objects
     Platform: new ImageSource('/images/Platform.png'),
