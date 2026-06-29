@@ -1,4 +1,4 @@
-import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, Vector } from "excalibur"
+import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, Vector, Keys, Label, Font, FontUnit } from "excalibur"
 import { Drone } from "../drone"
 import { Player } from "../player"
 import { Poster } from "../poster"
@@ -13,6 +13,7 @@ export class Southreach extends Scene {
 
     onActivate(context) {
         GameState.saveCheckpoint()
+        this.isAtExit = false // Reset de exit status bij het starten
     }
 
     onInitialize(engine) {
@@ -21,7 +22,7 @@ export class Southreach extends Scene {
         const levelImage = new Actor({
             x: 0,
             y: 0,
-            z: -100,
+            z: -100, // Zorgt dat de afbeelding helemaal achteraan wordt getekend
             anchor: Vector.Zero, 
             width: 2167,
             height: 726,
@@ -37,7 +38,6 @@ export class Southreach extends Scene {
 
         this.createPlatform(0, 635, 2167, 100)
         this.createPlatform(-50, 0, 50, 726)
-        this.createPlatform(2167, 0, 50, 726)
 
         // ==========================================
         // SPELER
@@ -48,6 +48,67 @@ export class Southreach extends Scene {
         player.previousBottom = player.pos.y
         player.onKnockoutComplete = () => this.restartLevel()
         this.add(player)
+
+       // ==========================================
+        // DE EXIT (Rechtemuur & Trigger)
+        // ==========================================
+
+        // 1. De harde muur (zodat je niet uit de map valt)
+        const rightWall = new Actor({
+            x: 2167,
+            y: 0,
+            width: 50,
+            height: 726,
+            anchor: Vector.Zero,
+            collisionType: CollisionType.Fixed,
+            color: Color.Transparent, 
+            z: 10
+        })
+        this.add(rightWall)
+
+        // 2. De onzichtbare "Exit Zone" (40 pixels voor de muur)
+        const exitTrigger = new Actor({
+            x: 2127, // Start 40 pixels eerder dan de echte muur
+            y: 0,
+            width: 40,
+            height: 726,
+            anchor: Vector.Zero,
+            collisionType: CollisionType.Passive, // Passive betekent dat je erin kunt staan!
+            color: Color.Transparent
+        })
+        this.add(exitTrigger)
+
+        // Maak het label aan (standaard leeg)
+        this.exitLabel = new Label({
+            text: "", 
+            color: Color.White,
+            x: 1850, 
+            y: 500,  
+            font: new Font({
+                family: 'MijnPixelFont', 
+                size: 20,
+                unit: FontUnit.Px
+            }),
+            z: 1000
+        })
+        this.add(this.exitLabel)
+
+        // Koppel de logica nu aan de Trigger Zone in plaats van de harde muur!
+        exitTrigger.on('collisionstart', (evt) => {
+            if (evt.other.owner === player) {
+                this.isAtExit = true
+                this.exitLabel.text = "press x to go to the next level"
+            }
+        })
+
+        exitTrigger.on('collisionend', (evt) => {
+            if (evt.other.owner === player) {
+                this.isAtExit = false
+                this.exitLabel.text = ""
+            }
+        })
+        
+        this.add(rightWall)
 
         // ==========================================
         // ONE-WAY PLATFORMEN
@@ -86,7 +147,7 @@ export class Southreach extends Scene {
         // NPCS & OBSTAKELS
         // ==========================================
 
-        // posters
+        // posters met specifieke maten en afbeeldingsbron
         this.add(new Poster(440, 570, 52, 41, Resources.PropagandaPoster))
         this.add(new Poster(720, 570, 52, 41, Resources.PropagandaPoster))
         this.add(new Poster(536, 447, 127, 66, Resources.PropagandaPoster))
@@ -94,7 +155,6 @@ export class Southreach extends Scene {
         this.add(new Poster(952, 562, 59, 69, Resources.PropagandaPoster2))
         this.add(new Poster(1353, 562, 65, 69, Resources.PropagandaPoster3))
         this.add(new Poster(1520, 370, 60, 62, Resources.PropagandaPoster3))
-
 
         const choiceNpc = new ChoiceNpc(600, 635)
         choiceNpc.setPlayer(player)
@@ -124,6 +184,14 @@ export class Southreach extends Scene {
         }))
     }
 
+    onPreUpdate(engine) {
+        // Controleer of de speler bij de muur staat en op X drukt
+        if (this.isAtExit && engine.input.keyboard.wasPressed(Keys.X)) {
+            console.log("Naar het volgende level!")
+            engine.goToScene("ironvale") 
+        }
+    }
+
     createPlatform(x, y, breedte, hoogte) {
         const platform = new Actor({
             x: x,
@@ -132,10 +200,7 @@ export class Southreach extends Scene {
             height: hoogte,
             anchor: Vector.Zero, 
             collisionType: CollisionType.Fixed,
-
-            // Debugkleur. Later Color.Transparent maken
             color: Color.Transparent,
-
             z: 10 
         })
 
