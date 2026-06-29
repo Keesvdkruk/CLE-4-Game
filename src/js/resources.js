@@ -57,6 +57,8 @@ export const Resources = {
     // Posters
     IronvalePoster: new ImageSource('/posters/ironvalePoster.png'),
     PropagandaPoster: new ImageSource('/posters/propagandaPoster.png'),
+    PropagandaPoster2: new ImageSource('/posters/propagandaPoster2.png'),
+    PropagandaPoster3: new ImageSource('/posters/propagandaPoster3.png'),
 
     // Fonts
     PixelFont: new FontSource('/fonts/pixel.ttf', 'MijnPixelFont'),

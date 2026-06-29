@@ -7,15 +7,22 @@ export class Player extends Actor {
         super({
             x: 100,
             y: 500,
-            width: 34,  
-            height: 80, 
+            width: 34,
+            height: 80,
             collisionType: CollisionType.Active,
             anchor: new Vector(0.5, 1)
         })
         
         this.onGround = false
-        this.facingLeft = false 
+        this.groundContacts = new Set()
+
+        this.oneWayPlatforms = []
+        this.previousBottom = this.pos.y
+        this.dropThroughTimer = 0
+
+        this.facingLeft = false
         this.isDestroyingPoster = false
+
         this.isKnockedOut = false
         this.hasBeenKnockedOutThisLevel = false
         this.knockoutStartTime = null
@@ -31,11 +38,6 @@ export class Player extends Actor {
     onInitialize(engine) {
         const playerScale = 0.75
 
-        // this.on('collisionstart', (evt) => {
-        //     this.onGround = true
-        // })
-
-        // Jouw 6 frames voor Idle
         const idleSheet = SpriteSheet.fromImageSource({
             image: Resources.Idle,
             grid: { rows: 1, columns: 6, spriteWidth: 256, spriteHeight: 256 }
@@ -85,6 +87,39 @@ export class Player extends Actor {
         this.graphics.use("idle")
     }
 
+    addOneWayPlatform(platform) {
+        this.oneWayPlatforms.push(platform)
+    }
+
+    addGroundContact(actor) {
+        this.groundContacts.add(actor)
+        this.onGround = true
+    }
+
+    removeGroundContact(actor) {
+        if (this.groundContacts.has(actor)) {
+            this.groundContacts.delete(actor)
+        }
+
+        this.onGround = this.groundContacts.size > 0
+    }
+
+    isStandingOnOneWayPlatform() {
+        for (const contact of this.groundContacts) {
+            if (contact.isOneWayPlatform) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    removeOneWayGroundContacts() {
+        for (const platform of this.oneWayPlatforms) {
+            this.removeGroundContact(platform)
+        }
+    }
+
     setDestroyingPoster(isDestroying) {
         if (this.isKnockedOut) {
             return
@@ -103,21 +138,31 @@ export class Player extends Actor {
         this.isDestroyingPoster = false
         this.knockoutIsHoldingFrame = false
         this.knockoutStartTime = Date.now()
+
         this.collisionType = CollisionType.PreventCollision
         this.vel = new Vector(0, 0)
+
+        this.groundContacts.clear()
+        this.onGround = false
+
         this.graphics.use("ko")
     }
 
     finishKnockout() {
         this.isKnockedOut = false
-        
-        this.hasBeenKnockedOutThisLevel = false 
+        this.hasBeenKnockedOutThisLevel = false
         
         this.knockoutStartTime = null
         this.knockoutIsHoldingFrame = false
+
         this.pos = new Vector(100, 500)
         this.vel = new Vector(0, 0)
+
+        this.groundContacts.clear()
         this.onGround = false
+        this.previousBottom = this.pos.y
+        this.dropThroughTimer = 0
+
         this.collisionType = CollisionType.Active
         this.graphics.use("idle")
 
@@ -126,8 +171,14 @@ export class Player extends Actor {
         }
     }
 
-    onPreUpdate(engine) {
-        this.vel.x = 0 
+    onPreUpdate(engine, delta) {
+        this.previousBottom = this.pos.y
+
+        if (this.dropThroughTimer > 0) {
+            this.dropThroughTimer -= delta
+        }
+
+        this.vel.x = 0
 
         if (this.isKnockedOut) {
             this.vel.y = 0
@@ -154,41 +205,110 @@ export class Player extends Actor {
             return
         }
 
-        if (engine.input.keyboard.isHeld(Keys.Left) || engine.input.keyboard.isHeld(Keys.A)) {
+        const links =
+            engine.input.keyboard.isHeld(Keys.Left) ||
+            engine.input.keyboard.isHeld(Keys.A)
+
+        const rechts =
+            engine.input.keyboard.isHeld(Keys.Right) ||
+            engine.input.keyboard.isHeld(Keys.D)
+
+        const spring =
+            engine.input.keyboard.wasPressed(Keys.Up) ||
+            engine.input.keyboard.wasPressed(Keys.Space) ||
+            engine.input.keyboard.wasPressed(Keys.W)
+
+        const wilOmlaag =
+            engine.input.keyboard.isHeld(Keys.S) ||
+            engine.input.keyboard.isHeld(Keys.Down)
+
+        if (links) {
             this.vel.x = -300
             this.facingLeft = true
-            this.graphics.use("walk")
-            
-        } else if (engine.input.keyboard.isHeld(Keys.Right) || engine.input.keyboard.isHeld(Keys.D)) {
+        } else if (rechts) {
             this.vel.x = 300
             this.facingLeft = false
-            this.graphics.use("walk")
-            
-        } else {
-            if (this.onGround) {
-                this.graphics.use("idle")
-            }
         }
 
-        if (engine.input.keyboard.wasPressed(Keys.Up) || engine.input.keyboard.wasPressed(Keys.Space) || engine.input.keyboard.wasPressed(Keys.W)) {
-            if (this.onGround) {
-                this.vel.y = -850
-                this.onGround = false 
-                this.graphics.use("jump")
-            }
+        if (wilOmlaag && this.isStandingOnOneWayPlatform()) {
+            this.dropThroughTimer = 250
+            this.removeOneWayGroundContacts()
+            this.pos.y += 5
+        }
+
+        if (spring && this.onGround && this.dropThroughTimer <= 0) {
+            this.vel.y = -850
+
+            this.groundContacts.clear()
+            this.onGround = false
+
+            this.graphics.use("jump")
         }
 
         if (!this.onGround) {
             this.graphics.use("jump")
+        } else if (links || rechts) {
+            this.graphics.use("walk")
+        } else {
+            this.graphics.use("idle")
         }
 
         this.graphics.current.flipHorizontal = this.facingLeft
     }
 
+    onPostUpdate(engine, delta) {
+        if (this.isKnockedOut) {
+            return
+        }
+
+        this.checkOneWayPlatforms()
+    }
+
+    checkOneWayPlatforms() {
+        if (this.dropThroughTimer > 0) {
+            this.removeOneWayGroundContacts()
+            return
+        }
+
+        const playerBottom = this.pos.y
+        const playerLeft = this.pos.x - this.width / 2
+        const playerRight = this.pos.x + this.width / 2
+
+        for (const platform of this.oneWayPlatforms) {
+            const platformTop = platform.getTop()
+            const platformLeft = platform.getLeft()
+            const platformRight = platform.getRight()
+
+            const overlapX =
+                playerRight > platformLeft + 4 &&
+                playerLeft < platformRight - 4
+
+            const spelerValtOfStaat = this.vel.y >= 0
+
+            const kwamVanBoven =
+                this.previousBottom <= platformTop + 10
+
+            const isNuBijPlatform =
+                playerBottom >= platformTop - 10 &&
+                playerBottom <= platformTop + 25
+
+            if (overlapX && spelerValtOfStaat && kwamVanBoven && isNuBijPlatform) {
+                this.pos.y = platformTop
+                this.vel.y = 0
+                this.addGroundContact(platform)
+            } else {
+                this.removeGroundContact(platform)
+            }
+        }
+    }
 
     onCollisionStart(self, other, side, contact) {
         if (side === Side.Bottom) {
-            this.onGround = true
+            this.addGroundContact(other)
         }
+    }
+
+    onCollisionEnd(self, other, side, contact) {
+        this.removeGroundContact(other)
     }
 }

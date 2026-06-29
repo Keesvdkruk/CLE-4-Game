@@ -1,25 +1,32 @@
 import { Actor, CollisionType, Color, Font, FontUnit, Keys, Label, Rectangle, Vector } from "excalibur"
-import { Resources } from "./resources.js"
 import { Player } from "./player.js"
 import { GameState } from "./state.js"
 
 export class Poster extends Actor {
-    constructor(x, y) {
-        const posterScale = 0.3
-        const posterWidth = 280 * posterScale
-        const posterHeight = 291 * posterScale
-
+    // Voeg de nieuwe parameters toe aan de constructor
+    constructor(x, y, width, height, posterImage) {
         super({
             x: x,
             y: y,
-            width: posterWidth,
-            height: posterHeight,
+            width: width,
+            height: height,
             collisionType: CollisionType.Passive, 
             z: -1 
         })
 
-        const posterSprite = Resources.PropagandaPoster.toSprite()
-        posterSprite.scale = new Vector(posterScale, posterScale)
+        // Converteer de ImageSource naar een Sprite
+        const posterSprite = posterImage.toSprite()
+        
+        // Bereken de schaal zodat de afbeelding netjes binnen de width en height past
+        const scaleX = width / posterSprite.width
+        const scaleY = height / posterSprite.height
+        
+        // Pas de schaal toe op de sprite
+        posterSprite.scale = new Vector(scaleX, scaleY)
+        
+        // Centreer het plaatje op de actor (optioneel, of laat anchor op 0,0)
+        // posterSprite.dest = ... (standaard pakt excalibur de center/anchor)
+        
         this.graphics.use(posterSprite)
         
         this.isPlayerNear = false 
@@ -84,8 +91,8 @@ export class Poster extends Actor {
             if (holdDuration >= 3000) {
                 console.log("Poster vernietigd!")
                 
-                // Haal 1 punt van de peace stat af (zorg dat hij niet onder de 0 zakt)
-                GameState.peace = Math.max(0, GameState.peace - 1)
+                // Haal 1 van de peace stat af (zorg dat hij niet onder de 0 zakt)
+                GameState.peace = Math.max(0, GameState.peace - 10)
                 console.log("Huidige Peace stat:", GameState.peace)
 
                 this.setPlayerDestroying(false)
@@ -175,9 +182,10 @@ export class Poster extends Actor {
         }
 
         const barX = this.pos.x
-        const barY = this.pos.y - (this.height / 2) - 14
+        // Blijft keurig in het midden boven de opgegeven height van de poster actor
+        const barY = this.pos.y - (this.height / 2) - 25 
         const fillWidth = this.barWidth * progress
-        const labelY = barY - 12
+        const labelY = barY - 25
 
         this.progressBarBackground.pos = new Vector(barX, barY)
         this.progressBarFill.graphics.use(new Rectangle({
