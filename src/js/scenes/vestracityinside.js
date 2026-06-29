@@ -3,6 +3,7 @@ import { Resources } from "../resources.js";
 import { Player } from "../player.js";
 import { Npc_1 } from "../npc_1.js";
 import { Npc_2 } from "../npc_2.js";
+import { GameState } from "../state.js";
 
 export class VestraCityInside extends Scene {
     onInitialize(engine) {
@@ -70,10 +71,32 @@ export class VestraCityInside extends Scene {
 
         this.add(choiceText);
 
-        const spawnProtestants = () => {
-            for (let i = 0; i < 20; i++) {
+        const statsText = new Label({
+            text: "Peace: " + GameState.peace + "   Support: " + GameState.support,
+            x: 40,
+            y: 40,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 22
+            })
+        });
 
-                const x = 80 + i * 40 + (Math.random() * 20 - 10);
+        this.add(statsText);
+
+        const updateStatsText = () => {
+            statsText.text = "Peace: " + GameState.peace + "   Support: " + GameState.support;
+        };
+
+        const getRebelAmount = () => {
+            return Math.max(4, Math.floor(GameState.support / 5));
+        };
+
+        const spawnProtestants = () => {
+            const rebelAmount = getRebelAmount();
+
+            for (let i = 0; i < rebelAmount; i++) {
+                const x = 80 + i * 55 + (Math.random() * 20 - 10);
                 const y = 600 + (Math.random() * 12 - 6);
 
                 const protestant = Math.random() < 0.5
@@ -119,6 +142,51 @@ export class VestraCityInside extends Scene {
             }
         };
 
+        const goToCorrectRoadScene = () => {
+            if (GameState.peace <= 50) {
+                engine.goToScene("roadtosquare");
+            } else {
+                engine.goToScene("peacefulroadtosquare");
+            }
+        };
+
+        const startExitFade = () => {
+            leavingScene = true;
+
+            choiceText.text = GameState.peace <= 50
+                ? "De stad kookt over. De menigte trekt gewelddadig naar het plein..."
+                : "De menigte trekt rustig richting het centrale plein...";
+
+            GameState.saveCheckpoint();
+
+            const fade = new Actor({
+                x: engine.drawWidth / 2,
+                y: engine.drawHeight / 2,
+                width: engine.drawWidth,
+                height: engine.drawHeight,
+                color: Color.Black
+            });
+
+            fade.graphics.opacity = 0;
+            this.add(fade);
+
+            const fadeTimer = new Timer({
+                interval: 40,
+                repeats: true,
+                fcn: () => {
+                    fade.graphics.opacity += 0.05;
+
+                    if (fade.graphics.opacity >= 1) {
+                        fadeTimer.cancel();
+                        goToCorrectRoadScene();
+                    }
+                }
+            });
+
+            this.add(fadeTimer);
+            fadeTimer.start();
+        };
+
         const leverTrigger = new Actor({
             x: 740,
             y: 560,
@@ -133,7 +201,7 @@ export class VestraCityInside extends Scene {
         leverTrigger.on("collisionstart", (event) => {
             if (event.other.owner?.name === "player" && !leverChoiceMade) {
                 nearLever = true;
-                choiceText.text = "E: open de poort voor support    Q: houd de poort dicht voor peace";
+                choiceText.text = "E: open de poort     Q: houd de poort dicht";
             }
         });
 
@@ -157,36 +225,7 @@ export class VestraCityInside extends Scene {
 
         exitTrigger.on("collisionstart", (event) => {
             if (gateOpen && event.other.owner?.name === "player" && !leavingScene) {
-                leavingScene = true;
-
-                choiceText.text = "De menigte trekt richting het centrale plein...";
-
-                const fade = new Actor({
-                    x: engine.drawWidth / 2,
-                    y: engine.drawHeight / 2,
-                    width: engine.drawWidth,
-                    height: engine.drawHeight,
-                    color: Color.Black
-                });
-
-                fade.graphics.opacity = 0;
-                this.add(fade);
-
-                const fadeTimer = new Timer({
-                    interval: 40,
-                    repeats: true,
-                    fcn: () => {
-                        fade.graphics.opacity += 0.05;
-
-                        if (fade.graphics.opacity >= 1) {
-                            fadeTimer.cancel();
-                            engine.goToScene("roadtosquare");
-                        }
-                    }
-                });
-
-                this.add(fadeTimer);
-                fadeTimer.start();
+                startExitFade();
             }
         });
 
@@ -196,10 +235,18 @@ export class VestraCityInside extends Scene {
                     leverChoiceMade = true;
                     gateOpen = true;
 
+                    GameState.peace -= 20;
+
+                    if (GameState.peace < 0) {
+                        GameState.peace = 0;
+                    }
+
+                    updateStatsText();
+
                     rightBorder.kill();
 
                     bg.graphics.use(Resources.VestraInsideOpen.toSprite());
-                    choiceText.text = "De poort gaat open...";
+                    choiceText.text = "De poort gaat open. Peace -20.";
 
                     const fade = new Actor({
                         x: engine.drawWidth / 2,
@@ -225,7 +272,7 @@ export class VestraCityInside extends Scene {
                                     fade.graphics.opacity = 1;
                                     fadingBack = true;
 
-                                    choiceText.text = "De menigte stroomt het plein op.";
+                                    choiceText.text = "Rebellen stromen naar binnen. Aantal gebaseerd op Support.";
                                     spawnProtestants();
                                 }
                             } else {
@@ -245,12 +292,17 @@ export class VestraCityInside extends Scene {
                 }
             }
 
-            if (engine.input.keyboard.wasPressed(Keys.Q)) {
-                if (nearLever && !leverChoiceMade) {
-                    leverChoiceMade = true;
-                    choiceText.text = "Je houdt de poort gesloten. Peace blijft hoger.";
-                }
-            }
+        if (engine.input.keyboard.wasPressed(Keys.Q)) {
+    if (nearLever && !leverChoiceMade) {
+        leverChoiceMade = true;
+        gateOpen = true;
+
+        rightBorder.kill();
+
+        choiceText.text = "Je houdt de poort gesloten. Peace blijft gelijk. Loop naar rechts.";
+        updateStatsText();
+    }
+}
         });
     }
 }
