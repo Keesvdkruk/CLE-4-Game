@@ -1,4 +1,4 @@
-import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, Vector, Keys, Label, Font, FontUnit, Canvas } from "excalibur"
+import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, Vector, Keys, Label, Font, FontUnit, Canvas, Timer } from "excalibur"
 import { Drone } from "../drone"
 import { Player } from "../player"
 import { Poster } from "../poster"
@@ -17,9 +17,132 @@ export class Southreach extends Scene {
         this.isAtPoliceMoney = false
         this.playerSeenByTower = false
         this.isCaughtByTower = false
+        this.hasReducedPeaceForStealing = false
     }
 
     onInitialize(engine) {
+        this.engine = engine
+
+        this.playIntro(engine, () => {
+            this.startLevel(engine)
+        })
+    }
+
+    playIntro(engine, startLevel) {
+        this.backgroundColor = Color.Black
+
+        const introBg = new Actor({
+            x: engine.drawWidth / 2,
+            y: engine.drawHeight / 2,
+            z: 9000
+        })
+
+        const introSprite = Resources.BgSouthreach1.toSprite()
+        introBg.graphics.use(introSprite)
+
+        introBg.scale.setTo(
+            engine.drawWidth / introSprite.width,
+            engine.drawHeight / introSprite.height
+        )
+
+        introBg.graphics.opacity = 0
+        this.add(introBg)
+
+        const darkOverlay = new Actor({
+            x: engine.drawWidth / 2,
+            y: engine.drawHeight / 2,
+            width: engine.drawWidth,
+            height: engine.drawHeight,
+            color: Color.fromRGB(0, 0, 0, 0.45),
+            z: 9001
+        })
+
+        this.add(darkOverlay)
+
+        let introAlpha = 0
+
+        const fadeInTimer = new Timer({
+            interval: 50,
+            repeats: true,
+            fcn: () => {
+                introAlpha += 0.03
+
+                if (introAlpha >= 1) {
+                    introAlpha = 1
+                    fadeInTimer.cancel()
+                }
+
+                introBg.graphics.opacity = introAlpha
+            }
+        })
+
+        this.add(fadeInTimer)
+        fadeInTimer.start()
+
+        const title = new Label({
+            text: "",
+            x: 130,
+            y: 50,
+            z: 9002,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 70
+            })
+        })
+
+        this.add(title)
+
+        const subtitle = new Label({
+            text: "",
+            x: 130,
+            y: 130,
+            z: 9002,
+            color: Color.White,
+            font: new Font({
+                family: "Upheaval",
+                size: 35
+            })
+        })
+
+        this.add(subtitle)
+
+        const fullTitle = "SOUTHREACH"
+        const fullSubtitle = "DE ARMSTE STAD VAN VESTRA..."
+
+        let titleIndex = 0
+        let subtitleIndex = 0
+
+        const introTimer = new Timer({
+            interval: 80,
+            repeats: true,
+            fcn: () => {
+                if (titleIndex < fullTitle.length) {
+                    title.text = fullTitle.substring(0, titleIndex + 1)
+                    titleIndex++
+                } else if (subtitleIndex < fullSubtitle.length) {
+                    subtitle.text = fullSubtitle.substring(0, subtitleIndex + 1)
+                    subtitleIndex++
+                } else {
+                    introTimer.cancel()
+
+                    setTimeout(() => {
+                        title.kill()
+                        subtitle.kill()
+                        introBg.kill()
+                        darkOverlay.kill()
+
+                        startLevel()
+                    }, 2000)
+                }
+            }
+        })
+
+        this.add(introTimer)
+        introTimer.start()
+    }
+
+    startLevel(engine) {
         this.engine = engine
 
         this.destroyedPosters = 0
@@ -36,6 +159,7 @@ export class Southreach extends Scene {
         this.isAtPoliceMoney = false
         this.playerSeenByTower = false
         this.isCaughtByTower = false
+        this.hasReducedPeaceForStealing = false
 
         const levelImage = new Actor({
             x: 0,
@@ -50,11 +174,9 @@ export class Southreach extends Scene {
         levelImage.graphics.use(Resources.BgSouthreach1.toSprite())
         this.add(levelImage)
 
-        // HARDE PLATFORMEN
         this.createPlatform(0, 635, 2167, 100)
         this.createPlatform(-50, 0, 50, 726)
 
-        // SPELER
         const player = new Player()
         player.pos = new Vector(100, 500)
         player.previousBottom = player.pos.y
@@ -64,7 +186,6 @@ export class Southreach extends Scene {
         this.player = player
         this.add(player)
 
-        // EXIT
         const rightWall = new Actor({
             x: 2167,
             y: 0,
@@ -116,13 +237,9 @@ export class Southreach extends Scene {
             }
         })
 
-        // POLICE CHECKPOINT MONEY HITBOX
         this.createPoliceMoneySpot(player)
-
-        // WACHTTOREN VISION CONE
         this.createWatchTowerVision(player)
 
-        // ONE-WAY PLATFORMEN
         this.createOneWayPlatform(0, 195, 315, 10, player)
         this.createOneWayPlatform(290, 340, 130, 15, player)
         this.createOneWayPlatform(75, 443, 265, 15, player)
@@ -152,7 +269,6 @@ export class Southreach extends Scene {
         this.createOneWayPlatform(1800, 480, 130, 10, player)
         this.createOneWayPlatform(2080, 510, 100, 15, player)
 
-        // POSTERS
         this.createPoster(440, 570, 52, 41, Resources.PropagandaPoster)
         this.createPoster(720, 570, 52, 41, Resources.PropagandaPoster)
         this.createPoster(536, 447, 127, 66, Resources.PropagandaPoster)
@@ -161,24 +277,19 @@ export class Southreach extends Scene {
         this.createPoster(1353, 562, 65, 69, Resources.PropagandaPoster3)
         this.createPoster(1520, 370, 60, 62, Resources.PropagandaPoster3)
 
-        // ZWERVERS
         this.createHomelessNpc(600, 635, player)
         this.createHomelessNpc(1040, 635, player)
         this.createHomelessNpc(1500, 635, player)
         this.createHomelessNpc(1980, 635, player)
 
-        // TRADER
         const trader = new Trader(670, 121)
         trader.setPlayer(player)
         trader.setBuyFoodCallback(() => this.buyFoodFromTrader())
         this.add(trader)
 
-        // DRONES: new Drone(x, y, snelheid, bereik)
-        this.add(new Drone(800, 600, 60, 250))
-        this.add(new Drone(1400, 400, 110, 350))
-        this.add(new Drone(500, 470, 80, 200))
+        this.add(new Drone(800, 600, 100, 250))
+        this.add(new Drone(1400, 400, 160, 350))
 
-        // UI & CAMERA
         this.createObjectivesLabel()
 
         this.add(new HUD())
@@ -224,8 +335,6 @@ export class Southreach extends Scene {
             height: 120,
             anchor: Vector.Zero,
             collisionType: CollisionType.Passive,
-
-            // Debug blauw. Later eventueel Color.Transparent maken.
             color: Color.fromRGB(0, 100, 255, 0.25),
             z: 20
         })
@@ -266,25 +375,17 @@ export class Southreach extends Scene {
     createWatchTowerVision(player) {
         this.watchPlayer = player
 
-        // Punt waar de cone vandaan komt, bovenin de wachttoren
         this.watchTowerOrigin = new Vector(1960, 235)
 
-        // Langer dan eerst
         this.watchConeLength = 580
-
-        // Groter = bredere driehoek
-        this.watchConeHalfAngle = 0.26
-
+        this.watchConeHalfAngle = 0.22
         this.watchConeBaseWidth = Math.tan(this.watchConeHalfAngle) * this.watchConeLength * 2
 
-        // Kijkt richting money deposit en sweept heen en weer
         this.watchConeMinAngle = 1.2
-        this.watchConeMaxAngle = 2.90
+        this.watchConeMaxAngle = 2.8
 
         this.watchConeAngle = this.watchConeMinAngle
         this.watchConeDirection = 1
-
-        // Lager = langzamer
         this.watchConeSpeed = 0.12
 
         this.watchTowerCone = new Actor({
@@ -365,7 +466,6 @@ export class Southreach extends Scene {
         this.watchTowerCone.pos = new Vector(this.watchTowerOrigin.x, this.watchTowerOrigin.y)
         this.watchTowerCone.rotation = this.watchConeAngle
 
-        // Alleen gepakt worden als je bij de money deposit staat
         this.playerSeenByTower = this.isAtPoliceMoney && this.isPlayerInsideWatchCone()
 
         if (this.playerSeenByTower) {
@@ -466,13 +566,18 @@ export class Southreach extends Scene {
         this.moneyStolen += 1
         this.player.money += 1
 
+        if (this.moneyStolen >= this.totalMoney && !this.hasReducedPeaceForStealing) {
+            GameState.peace = Math.max(0, (GameState.peace ?? 0) - 10)
+            this.hasReducedPeaceForStealing = true
+        }
+
         this.updatePoliceMoneyPrompt()
         this.updateObjectivesText()
     }
 
     buyFoodFromTrader() {
         if (this.hasBoughtFood) {
-            return "You already bought bread."
+            return "You already bought food."
         }
 
         if (this.player.money < this.totalMoney) {
@@ -485,7 +590,7 @@ export class Southreach extends Scene {
 
         this.updateObjectivesText()
 
-        return "Bread bought. Feed the hungry."
+        return "Pleasure doing business with you."
     }
 
     giveFoodToHomeless(npc) {
@@ -501,7 +606,7 @@ export class Southreach extends Scene {
         this.player.food -= 1
         this.foodGiven += 1
 
-        GameState.support = (GameState.support ?? 0) + 1
+        GameState.support = Math.min(100, (GameState.support ?? 0) + 5)
 
         this.updateObjectivesText()
 
@@ -610,6 +715,7 @@ export class Southreach extends Scene {
 
         this.clear()
         this.camera.clearAllStrategies()
-        this.onInitialize(this.engine)
+
+        this.startLevel(this.engine)
     }
 }

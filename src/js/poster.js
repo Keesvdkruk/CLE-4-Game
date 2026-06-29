@@ -92,7 +92,7 @@ export class Poster extends Actor {
                 console.log("Poster vernietigd!")
                 
                 // Haal 1 van de peace stat af (zorg dat hij niet onder de 0 zakt)
-                GameState.peace = Math.max(0, GameState.peace - 10)
+                GameState.peace = Math.max(0, GameState.peace - 2)
                 console.log("Huidige Peace stat:", GameState.peace)
 
                 this.setPlayerDestroying(false)
