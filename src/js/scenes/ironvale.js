@@ -4,7 +4,8 @@ import { Resources } from "../resources"
 import { ironvalePlatform } from "../ironvalePlatform"
 import { WorkerNpc } from "../worker"
 import { Spike } from "../spike"
-import { HUD } from "../hud.js"
+import { GameState } from "../state"
+import { HUD } from "../HUD"
 import { OneWayPlatform } from "../OneWayPlatform.js"
 
 export class Ironvale extends Scene {
@@ -227,6 +228,16 @@ export class Ironvale extends Scene {
             addSpikeRow(690, 550, 3)
             addSpikeRow(1250, 650, 7)
             addSpikeRow(1500, 470, 5)
+
+            // Player
+            const player = new Player()
+            player.pos = new Vector(0, 430)
+            player.name = "player"
+            player.onKnockoutComplete = () => {
+                this.engine.lastScene = "ironvale";
+                this.engine.goToScene("gameover");
+            }
+            this.add(player)
 
             // Workers
             const worker1 = new WorkerNpc(
