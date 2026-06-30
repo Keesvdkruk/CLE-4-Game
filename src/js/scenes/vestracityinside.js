@@ -5,6 +5,7 @@ import { Npc_1 } from "../npc_1.js";
 import { Npc_2 } from "../npc_2.js";
 import { GameState } from "../state.js";
 import { HUD } from "../HUD.js";
+import { MenuButton } from "./MenuButton.js";
 
 export class VestraCityInside extends Scene {
     onInitialize(engine) {
@@ -26,8 +27,11 @@ export class VestraCityInside extends Scene {
 
         this.add(ground);
 
-        const hud = new HUD();
-        this.add(hud);
+         const hud = new HUD();
+                this.add(hud);
+        
+                const menuButton = new MenuButton();
+                this.add(menuButton);
 
         const leftBorder = new Actor({
             x: -25,

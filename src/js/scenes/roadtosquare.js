@@ -2,10 +2,13 @@ import { Scene, Actor, CollisionType, Label, Font, Color, Timer, Keys, } from "e
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
 import { HUD } from "../HUD.js";
+import { MenuButton } from "./MenuButton.js";
+import { GameState } from "../state.js";
 
 
 export class RoadToSquare extends Scene {
     onInitialize(engine) {
+        GameState.currentScene = "peacefulroadtosquare";
         this.backgroundColor = Color.Black;
 
         const bgWidth = 1536;
@@ -36,8 +39,11 @@ export class RoadToSquare extends Scene {
         this.add(ground);
 
 
-        const hud = new HUD();
-        this.add(hud);
+         const hud = new HUD();
+                this.add(hud);
+        
+                const menuButton = new MenuButton();
+                this.add(menuButton);
 
         const leftBorder = new Actor({
             x: -25,
@@ -208,7 +214,7 @@ export class RoadToSquare extends Scene {
 
         const objective = new Label({
             text: "Objective: volg de menigte richting het centrale plein.",
-            x: 40,
+            x: 340,
             y: 40,
             color: Color.White,
             font: new Font({
@@ -220,7 +226,7 @@ export class RoadToSquare extends Scene {
         this.add(objective);
         const scoreText = new Label({
             text: "Time: 0.00",
-            x: 40,
+            x: 340,
             y: 70,
             color: Color.White,
             font: new Font({
@@ -233,7 +239,7 @@ export class RoadToSquare extends Scene {
 
         const highScoreText = new Label({
             text: bestTime === null ? "Best: --" : "Best: " + bestTime.toFixed(2),
-            x: 40,
+            x: 340,
             y: 100,
             color: Color.White,
             font: new Font({
@@ -246,8 +252,8 @@ export class RoadToSquare extends Scene {
 
         const retryText = new Label({
             text: "Druk R om opnieuw te gaan",
-            x: 900,
-            y: 40,
+            x: 340,
+            y: 130,
             color: Color.White,
             font: new Font({
                 family: "Upheaval",
