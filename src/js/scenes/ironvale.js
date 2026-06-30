@@ -53,7 +53,7 @@ export class Ironvale extends Scene {
             text: "",
             x: 130,
             y: 50,
-            color: Color.Black,
+            color: Color.White,
             font: new Font({
                 family: "Upheaval",
                 size: 70
@@ -65,7 +65,7 @@ export class Ironvale extends Scene {
             text: "",
             x: 130,
             y: 130,
-            color: Color.Black,
+            color: Color.White,
             font: new Font({
                 family: "Upheaval",
                 size: 35
@@ -118,7 +118,7 @@ export class Ironvale extends Scene {
                 y: 40,
                 color: Color.White,
                 font: new Font({
-                    family: "Upheaval",
+                    family: "MijnPixelFont",
                     size: 24
                 })
             })
@@ -232,9 +232,9 @@ export class Ironvale extends Scene {
             )
 
             const worker3 = new WorkerNpc(
-                2100,
+                2050,
                 290,
-                "De regering beschermt alleen de fabriekseigenaren..."
+                "De regering is tegen ons..."
             )
 
             worker1.setPlayer(player)
@@ -289,7 +289,7 @@ export class Ironvale extends Scene {
     workerTalkedTo() {
         this.workersSpoken++
         this.objective.text =
-            `Gain information from workers (${this.workersSpoken}/3)`
+            `Haal informatie op bij arbeiders (${this.workersSpoken}/3)`
 
         if (this.workersSpoken >= 3) {
             this.canLeave = true

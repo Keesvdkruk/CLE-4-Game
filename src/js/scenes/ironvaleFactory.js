@@ -1,4 +1,4 @@
-import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, Vector } from "excalibur"
+import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, Vector, Label, Font, Keys } from "excalibur"
 import { Player } from "../player"
 import { Background } from "../background"
 import { Resources } from "../resources"
@@ -11,6 +11,15 @@ import { Prisoner } from "../prisoner"
 
 export class IronvaleFactory extends Scene {
 
+    objective
+    prisonersFreed = 0
+    canLeave = false
+    playerNearDoor = false
+    playerRef = null
+    doorPrompt = null
+    exitDoor = null
+
+
     onInitialize(engine) {
         const factoryBg = new Actor({
             x: 0,
@@ -21,6 +30,20 @@ export class IronvaleFactory extends Scene {
         factoryBg.graphics.use(Resources.BgFactory.toSprite())
 
         this.add(factoryBg)
+
+        this.objective = new Label({
+            text: "Bevrijd de arbeiders (0/3)",
+            x: 40,
+            y: 40,
+            color: Color.White,
+            font: new Font({
+                family: "MijnPixelFont",
+                size: 24
+            })
+        })
+
+        this.objective.z = 100
+        this.add(this.objective)
 
         const ground = new ironvaleGround()
         this.add(ground)
@@ -59,24 +82,67 @@ export class IronvaleFactory extends Scene {
 
         // Drones
         this.add(new IronvaleDrone(200, 100))
-        this.add(new IronvaleDrone(700, 330))
+        this.add(new IronvaleDrone(700, 345))
+
+        // Player
+        const player = new Player()
+        this.add(player)
 
         // Prisoners
         const prisoner1 = new Prisoner(170, 200)
         const prisoner2 = new Prisoner(1350, 165)
         const prisoner3 = new Prisoner(800, 470)
 
-        prisoner1.onFreed = () => {
-            console.log("Prisoner freed!")
-        }
+        prisoner1.onFreed = () => this.prisonerFreed()
+        prisoner2.onFreed = () => this.prisonerFreed()
+        prisoner3.onFreed = () => this.prisonerFreed()
 
         this.add(prisoner1)
         this.add(prisoner2)
         this.add(prisoner3)
 
-        // Player
-        const player = new Player()
-        this.add(player)
+        // EXIT DOOR
+        const exitDoor = new Actor({
+            x: 1650,
+            y: 200,
+            width: 80,
+            height: 120,
+            collisionType: CollisionType.Passive
+        })
+
+        this.exitDoor = exitDoor
+
+        exitDoor.on("collisionstart", (evt) => {
+            if (evt.other.owner instanceof Player) {
+                this.playerNearDoor = true
+                this.playerRef = evt.other.owner
+            }
+        })
+
+        exitDoor.on("collisionend", (evt) => {
+            if (evt.other.owner instanceof Player) {
+                this.playerNearDoor = false
+                this.playerRef = null
+            }
+        })
+
+        this.add(exitDoor)
+
+
+        // DOOR PROMPT (moet NA add + NA exitDoor)
+        this.doorPrompt = new Label({
+            text: "",
+            x: 0,
+            y: 0,
+            color: Color.White,
+            font: new Font({
+                family: "MijnPixelFont",
+                size: 18
+            })
+        })
+
+        this.doorPrompt.z = 200
+        this.add(this.doorPrompt)
 
         // Camera
         this.camera.strategy.lockToActorAxis(player, Axis.X)
@@ -87,4 +153,62 @@ export class IronvaleFactory extends Scene {
             bottom: 720
         }))
     }
+
+    prisonerFreed() {
+
+        this.prisonersFreed++
+
+        this.objective.text =
+            `Bevrijd de arbeiders (${this.prisonersFreed}/3)`
+
+        if (this.prisonersFreed >= 3) {
+
+            this.canLeave = true
+
+            this.objective.text =
+                "Alle arbeiders bevrijd, zoek de uitgang"
+        }
+    }
+
+    onPreUpdate(engine) {
+
+        if (this.objective) {
+            this.objective.pos.x = Math.round(this.camera.pos.x - 600)
+            this.objective.pos.y = Math.round(this.camera.pos.y - 320)
+        }
+
+        if (this.playerNearDoor && this.canLeave) {
+            this.doorPrompt.text = "Druk E om door de deur te gaan"
+
+            this.doorPrompt.pos = new Vector(
+                this.exitDoor.pos.x - 150,
+                this.exitDoor.pos.y - 80
+            )
+        } else {
+            this.doorPrompt.text = ""
+        }
+
+        if (engine.input.keyboard.wasPressed(Keys.E)) {
+            if (this.canLeave && this.playerNearDoor) {
+                this.goToNextLevel(engine)
+            }
+        }
+    }
+
+    restartLevel() {
+
+        this.prisonersFreed = 0
+        this.canLeave = false
+
+        this.clear()
+        this.camera.clearAllStrategies()
+
+        this.onInitialize(this.engine)
+    }
+
+    goToNextLevel(engine) {
+        engine.goToScene("eastwatch")
+    }
+
+
 }
