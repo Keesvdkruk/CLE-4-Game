@@ -34,22 +34,23 @@ export const Resources = {
 
     //Diana:
     BgIronvale: new ImageSource('/ironvale/ironvale1.png'),
-    Bg2Ironvale: new ImageSource('/ironvale/ironvale2.png'),
-    Bg3Ironvale: new ImageSource('/ironvale/ironvale3.png'),
-    Bg4Ironvale: new ImageSource('/ironvale/ironvale4.png'),
 
-    BgFactory1: new ImageSource('/ironvale/factory1.png'),
-    BgFactory2: new ImageSource('/ironvale/factory2.png'),
-    BgFactory3: new ImageSource('/ironvale/factory3.png'),
+    BgFactory: new ImageSource('/ironvale/factory.png'),
 
     IronvaleIntro: new ImageSource('/ironvale/ironvale.png'),
 
+    IronvaleDrone1Forward: new ImageSource('/ironvale/Drone1-Forward.png'),
+    IronvaleDrone2Forward: new ImageSource('/ironvale/Drone2-Forward.png'),
+
+    Worker: new ImageSource('/ironvale/worker.png'),
+
+    PrisonerCageClosed: new ImageSource('/ironvale/prisoner.png'),
+    PrisonerCageOpen: new ImageSource('/ironvale/cage.png'),
 
     //Efe:
-    Eastwatch1: new ImageSource('/eastwatch/Eastwatch1.png'),
-    Eastwatch2: new ImageSource('/eastwatch/Eastwatch2.png'),
-    Eastwatch3: new ImageSource('/eastwatch/Eastwatch3.png'),
-    Eastwatch4: new ImageSource('/eastwatch/Eastwatch4.png'),
+    EastwatchOutside: new ImageSource('/eastwatch/eastwatchoutside.png'),
+    EastwatchInside: new ImageSource('/eastwatch/eastwatchinside.png'),
+    Guard: new ImageSource('/eastwatch/guard.png'),
 
     // Objects
     Platform: new ImageSource('/images/Platform.png'),
@@ -57,6 +58,8 @@ export const Resources = {
     // Posters
     IronvalePoster: new ImageSource('/posters/ironvalePoster.png'),
     PropagandaPoster: new ImageSource('/posters/propagandaPoster.png'),
+    PropagandaPoster2: new ImageSource('/posters/propagandaPoster2.png'),
+    PropagandaPoster3: new ImageSource('/posters/propagandaPoster3.png'),
 
     // Fonts
     PixelFont: new FontSource('/fonts/pixel.ttf', 'MijnPixelFont'),

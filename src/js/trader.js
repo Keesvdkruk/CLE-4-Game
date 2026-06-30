@@ -1,4 +1,4 @@
-import { Actor, CollisionType, SpriteSheet, Animation, Vector, Label, Font, FontUnit, Color } from "excalibur"
+import { Actor, CollisionType, SpriteSheet, Animation, Vector, Label, Font, FontUnit, Color, Keys } from "excalibur"
 import { Resources } from "./resources.js"
 
 export class Trader extends Actor {
@@ -8,27 +8,45 @@ export class Trader extends Actor {
             y: y,
             width: 128,
             height: 128,
-            collisionType: CollisionType.Passive,
+
+            // Geen collision-events meer voor interactie
+            collisionType: CollisionType.PreventCollision,
+
             anchor: new Vector(0.5, 1)
         })
 
         this.name = "trader"
         this.player = null
-        this.currentState = null
+        this.engine = null
+
         this.isPlayerNear = false
-        this.dialoguePlayedThisApproach = false
+        this.interactRangeX = 95
+        this.interactRangeY = 110
+
         this.dialogueLabel = null
-        this.dialogueText = "Wanna buy some meth kid?"
+        this.dialogueText = "Bread for sale. Press X to buy."
         this.dialogueTypeDurationMs = 1000
+
         this.dialogueFrames = []
-        this.dialogueFrameIndex = 0
-        this.dialogueFrameDurationMs = 150
-        this.dialogueNextFrameAt = null
-        this.dialogueResuming = false
+        this.frameIndex = 0
+        this.frameDurationMs = 150
+        this.nextFrameAt = null
+
+        // idle, opening, holdOpen, closing
+        this.state = "idle"
+
+        this.onBuyFood = null
+
+        // Onthoudt welke kant de trader op kijkt
+        this.facingLeft = false
     }
 
     setPlayer(player) {
         this.player = player
+    }
+
+    setBuyFoodCallback(callback) {
+        this.onBuyFood = callback
     }
 
     onInitialize(engine) {
@@ -54,32 +72,10 @@ export class Trader extends Actor {
         })
 
         this.graphics.add("idle", idleAnim)
-        this.graphics.add("dialogue", this.dialogueFrames[0])
         this.graphics.use("idle")
-        this.currentState = "idle"
+        this.applyFacingDirection()
 
-        this.on('collisionstart', (evt) => {
-            if (evt.other.owner === this.player) {
-                this.isPlayerNear = true
-                this.showDialogueLabel()
-                this.startDialogue()
-            }
-        })
-
-        this.on('collisionend', (evt) => {
-            if (evt.other.owner === this.player) {
-                this.isPlayerNear = false
-                this.hideDialogueLabel()
-
-                if (!this.dialoguePlayedThisApproach) {
-                    this.dialoguePlayedThisApproach = false
-                    this.setIdle()
-                } else if (this.dialogueFrameIndex >= 9) {
-                    this.dialogueResuming = true
-                    this.dialogueNextFrameAt = Date.now() + this.dialogueFrameDurationMs
-                }
-            }
-        })
+        this.state = "idle"
     }
 
     onPreUpdate(engine) {
@@ -87,68 +83,166 @@ export class Trader extends Actor {
             return
         }
 
-        if (this.dialoguePlayedThisApproach) {
-            this.updateDialogueLabel(this.dialogueFrameIndex * this.dialogueFrameDurationMs)
-            this.updateDialoguePlayback()
+        const nearNow = this.isPlayerInsideRange()
+
+        if (nearNow && !this.isPlayerNear) {
+            this.onPlayerEnter()
         }
 
-        if (this.graphics.current) {
-            this.graphics.current.flipHorizontal = this.player.pos.x < this.pos.x
+        if (!nearNow && this.isPlayerNear) {
+            this.onPlayerLeave()
         }
 
-        if (this.dialogueLabel) {
-            this.dialogueLabel.pos = new Vector(this.pos.x, this.pos.y - 92)
+        this.isPlayerNear = nearNow
+
+        if (this.isPlayerNear) {
+            this.facePlayer()
+
+            if (engine.input.keyboard.wasPressed(Keys.X)) {
+                this.tryBuyFood()
+            }
+        }
+
+        this.updateAnimationState()
+        this.updateDialoguePosition()
+    }
+
+    isPlayerInsideRange() {
+        const dx = Math.abs(this.player.pos.x - this.pos.x)
+        const dy = Math.abs(this.player.pos.y - this.pos.y)
+
+        return dx <= this.interactRangeX && dy <= this.interactRangeY
+    }
+
+    onPlayerEnter() {
+        this.facePlayer()
+        this.dialogueText = "Bread for sale. Press X to buy."
+        this.showDialogueLabel()
+        this.startOpening()
+    }
+
+    onPlayerLeave() {
+        this.hideDialogueLabel()
+
+        if (this.state === "opening" || this.state === "holdOpen") {
+            this.startClosing()
         }
     }
 
-    updateDialoguePlayback() {
-        if (!this.dialogueFrames.length || this.dialogueNextFrameAt === null) {
+    startOpening() {
+        this.state = "opening"
+        this.frameIndex = 0
+        this.nextFrameAt = Date.now() + this.frameDurationMs
+        this.useDialogueFrame(this.frameIndex)
+    }
+
+    startClosing() {
+        this.state = "closing"
+
+        if (this.frameIndex < 9) {
+            this.frameIndex = 9
+        }
+
+        this.nextFrameAt = Date.now() + this.frameDurationMs
+        this.useDialogueFrame(this.frameIndex)
+    }
+
+    updateAnimationState() {
+        if (this.state !== "opening" && this.state !== "closing") {
             return
         }
 
         const now = Date.now()
 
-        if (now < this.dialogueNextFrameAt) {
+        if (this.nextFrameAt === null || now < this.nextFrameAt) {
             return
         }
 
-        if (!this.dialogueResuming) {
-            if (this.dialogueFrameIndex < 9) {
-                this.dialogueFrameIndex += 1
-                this.useDialogueFrame(this.dialogueFrameIndex)
-                this.dialogueNextFrameAt = now + this.dialogueFrameDurationMs
+        if (this.state === "opening") {
+            if (this.frameIndex < 9) {
+                this.frameIndex += 1
+                this.useDialogueFrame(this.frameIndex)
+                this.nextFrameAt = now + this.frameDurationMs
                 return
             }
 
-            if (this.isPlayerNear) {
-                this.dialogueNextFrameAt = now + this.dialogueFrameDurationMs
+            // Stop op frame 9: jas open
+            this.state = "holdOpen"
+            this.nextFrameAt = null
+            this.useDialogueFrame(9)
+            return
+        }
+
+        if (this.state === "closing") {
+            if (this.frameIndex < 15) {
+                this.frameIndex += 1
+                this.useDialogueFrame(this.frameIndex)
+                this.nextFrameAt = now + this.frameDurationMs
                 return
             }
 
-            this.dialogueResuming = true
-            this.dialogueNextFrameAt = now + this.dialogueFrameDurationMs
-            return
+            this.setIdle()
         }
-
-        if (this.dialogueFrameIndex < 15) {
-            this.dialogueFrameIndex += 1
-            this.useDialogueFrame(this.dialogueFrameIndex)
-            this.dialogueNextFrameAt = now + this.dialogueFrameDurationMs
-            return
-        }
-
-        this.finishDialogue()
     }
 
     useDialogueFrame(frameIndex) {
-        if (this.dialogueFrames[frameIndex]) {
-            this.graphics.use(this.dialogueFrames[frameIndex])
-            this.currentState = "dialogue"
+        if (!this.dialogueFrames[frameIndex]) {
+            return
+        }
+
+        this.graphics.use(this.dialogueFrames[frameIndex])
+        this.applyFacingDirection()
+    }
+
+    setIdle() {
+        this.state = "idle"
+        this.frameIndex = 0
+        this.nextFrameAt = null
+        this.graphics.use("idle")
+        this.applyFacingDirection()
+    }
+
+    facePlayer() {
+        if (!this.player) {
+            return
+        }
+
+        const dx = this.player.pos.x - this.pos.x
+
+        // Deadzone voorkomt links/rechts twitch als je precies op dezelfde x staat
+        if (Math.abs(dx) < 12) {
+            return
+        }
+
+        this.facingLeft = dx < 0
+        this.applyFacingDirection()
+    }
+
+    applyFacingDirection() {
+        if (!this.graphics.current) {
+            return
+        }
+
+        this.graphics.current.flipHorizontal = this.facingLeft
+    }
+
+    tryBuyFood() {
+        if (typeof this.onBuyFood !== "function") {
+            return
+        }
+
+        const resultText = this.onBuyFood()
+
+        if (resultText) {
+            this.dialogueText = resultText
+            this.showDialogueLabel()
+            this.updateDialogueLabel(this.dialogueTypeDurationMs)
         }
     }
 
     showDialogueLabel() {
         if (this.dialogueLabel) {
+            this.updateDialogueLabel(this.dialogueTypeDurationMs)
             return
         }
 
@@ -156,7 +250,7 @@ export class Trader extends Actor {
             text: "",
             color: Color.White,
             font: new Font({
-                family: 'MijnPixelFont',
+                family: "MijnPixelFont",
                 size: 15,
                 unit: FontUnit.Px
             })
@@ -165,7 +259,9 @@ export class Trader extends Actor {
         this.dialogueLabel.anchor = new Vector(0.5, 0.5)
         this.dialogueLabel.z = 1003
         this.engine.currentScene.add(this.dialogueLabel)
-        this.updateDialogueLabel(0)
+
+        this.updateDialogueLabel(this.dialogueTypeDurationMs)
+        this.updateDialoguePosition()
     }
 
     updateDialogueLabel(elapsedMs) {
@@ -179,6 +275,14 @@ export class Trader extends Actor {
         this.dialogueLabel.text = this.dialogueText.substring(0, visibleCharacters)
     }
 
+    updateDialoguePosition() {
+        if (!this.dialogueLabel) {
+            return
+        }
+
+        this.dialogueLabel.pos = new Vector(this.pos.x, this.pos.y - 92)
+    }
+
     hideDialogueLabel() {
         if (!this.dialogueLabel) {
             return
@@ -186,39 +290,5 @@ export class Trader extends Actor {
 
         this.dialogueLabel.kill()
         this.dialogueLabel = null
-    }
-
-    startDialogue() {
-        if (this.dialoguePlayedThisApproach) {
-            return
-        }
-
-        this.dialoguePlayedThisApproach = true
-        this.dialogueResuming = false
-        this.dialogueFrameIndex = 0
-        this.dialogueNextFrameAt = Date.now() + this.dialogueFrameDurationMs
-        this.useDialogueFrame(0)
-        this.currentState = "dialogue"
-    }
-
-    finishDialogue() {
-        this.dialogueResuming = false
-        this.dialogueNextFrameAt = null
-        this.dialogueFrameIndex = 0
-
-        if (this.currentState !== "idle") {
-            this.setIdle()
-        }
-
-        if (!this.isPlayerNear) {
-            this.dialoguePlayedThisApproach = false
-        }
-    }
-
-    setIdle() {
-        if (this.currentState !== "idle") {
-            this.graphics.use("idle")
-            this.currentState = "idle"
-        }
     }
 }

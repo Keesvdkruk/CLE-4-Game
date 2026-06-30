@@ -33,12 +33,12 @@ export class HUD extends ScreenElement {
             color: Color.White,
             font: new Font({ family: 'MijnPixelFont', size: 15, unit: FontUnit.Px }),
             x: 0, 
-            y: 110
+            y: 75
         });
         this.supportLabel.scale = new Vector(2, 2);
         this.addChild(this.supportLabel);
 
-        this.supportBar = new StatBar(0, 155, 3, 20);
+        this.supportBar = new StatBar(0, 120, 3, 100);
         this.addChild(this.supportBar);
     }
 

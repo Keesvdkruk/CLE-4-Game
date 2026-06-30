@@ -5,10 +5,10 @@ export class ironvaleGround extends Actor {
     constructor() {
         super({
             x: 2000,
-            y: 700,           
+            y: 710,           
             width: 4000,
-            height: 40,
-            color: Color.Brown, 
+            height: 30,
+            color: Color.Black, 
             collisionType: CollisionType.Fixed 
         })
         

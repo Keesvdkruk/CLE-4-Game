@@ -2,8 +2,8 @@ import { Actor, Animation, CollisionType, Color, SpriteSheet, Vector } from "exc
 import { Player } from "./player.js"
 import { Resources } from "./resources.js"
 
-export class Drone extends Actor {
-    constructor(x, y, snelheid = 100, bereik = 250) {
+export class IronvaleDrone extends Actor {
+    constructor(x, y) {
         super({
             x: x,
             y: y,
@@ -12,38 +12,29 @@ export class Drone extends Actor {
             color: Color.Red,
             collisionType: CollisionType.Passive 
         })
-
-        this.snelheid = snelheid
-        this.bereik = bereik
     }
 
     onInitialize(engine) {
         const walkSheet = SpriteSheet.fromImageSource({
-            image: Resources.DroneWalk,
+            image: Resources.IronvaleDrone1Forward,
             grid: { rows: 1, columns: 4, spriteWidth: 48, spriteHeight: 48 }
         })
 
         const walkAnim = Animation.fromSpriteSheet(walkSheet, [0, 1, 2, 3], 80)
-
         this.graphics.add("walk", walkAnim)
         this.graphics.use("walk")
 
         this.actions.repeatForever(ctx => {
-            ctx.moveBy(this.bereik, 0, this.snelheid)
-               .moveBy(-this.bereik, 0, this.snelheid)
+            ctx.moveBy(250, 0, 100)   
+               .moveBy(-250, 0, 100)  
         })
 
-        this.on("collisionstart", (evt) => {
-            const hitPlayer =
-                evt.other instanceof Player
-                    ? evt.other
-                    : evt.other?.owner instanceof Player
-                        ? evt.other.owner
-                        : null
-
-            if (hitPlayer) {
+        // --- BETRAPT WORDEN ---
+        this.on('collisionstart', (evt) => {
+            if (evt.other.owner instanceof Player) {
                 console.log("BETRAPT! Terug naar de start.")
-                hitPlayer.startKnockout()
+                
+                evt.other.owner.startKnockout()
             }
         })
     }
