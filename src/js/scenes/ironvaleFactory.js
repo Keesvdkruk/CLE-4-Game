@@ -8,6 +8,8 @@ import { ironvalePoster } from "../ironvalePoster"
 import { IronvaleDrone } from "../ironvaleDrone"
 import { IronvaleDrone2 } from "../ironvaleDrone2"
 import { Prisoner } from "../prisoner"
+import { GameState } from "../state.js"
+import { HUD } from "../hud.js"
 
 export class IronvaleFactory extends Scene {
 
@@ -21,6 +23,7 @@ export class IronvaleFactory extends Scene {
 
 
     onInitialize(engine) {
+        this.add(new HUD())
         const factoryBg = new Actor({
             x: 0,
             y: 0,
@@ -158,6 +161,11 @@ export class IronvaleFactory extends Scene {
 
         this.prisonersFreed++
 
+        GameState.peace = Math.max(0, GameState.peace - 2)
+        console.log("Huidige Peace stat:", GameState.peace)
+        GameState.support = Math.min(100, GameState.support + 12)
+        console.log("Huidige Support stat:", GameState.support)
+
         this.objective.text =
             `Bevrijd de arbeiders (${this.prisonersFreed}/3)`
 
@@ -173,7 +181,7 @@ export class IronvaleFactory extends Scene {
     onPreUpdate(engine) {
 
         if (this.objective) {
-            this.objective.pos.x = Math.round(this.camera.pos.x - 600)
+            this.objective.pos.x = Math.round(this.camera.pos.x + 180)
             this.objective.pos.y = Math.round(this.camera.pos.y - 320)
         }
 

@@ -1,14 +1,11 @@
 import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, Label, Font, Timer, Vector } from "excalibur"
 import { Player } from "../player"
-import { Background } from "../background"
 import { Resources } from "../resources"
-import { ironvalePoster } from "../ironvalePoster"
-import { ironvaleGround } from "../ironvaleGround"
 import { ironvalePlatform } from "../ironvalePlatform"
 import { WorkerNpc } from "../worker"
-import { IronvaleDrone } from "../ironvaleDrone"
-import { MovingPlatform } from "../movingPlatform"
 import { Spike } from "../spike"
+import { HUD } from "../hud.js"
+import { OneWayPlatform } from "../OneWayPlatform.js"
 
 export class Ironvale extends Scene {
 
@@ -17,17 +14,19 @@ export class Ironvale extends Scene {
     canLeave = false
 
     onInitialize(engine) {
+        this.engine = engine
+
         // Intro
-        this.backgroundColor = Color.Black;
+        this.backgroundColor = Color.Black
 
         const introBg = new Actor({
             x: engine.drawWidth / 2,
             y: engine.drawHeight / 2
-        });
+        })
 
-        introBg.graphics.use(Resources.IronvaleIntro.toSprite());
-        introBg.graphics.opacity = 0;
-        this.add(introBg);
+        introBg.graphics.use(Resources.IronvaleIntro.toSprite())
+        introBg.graphics.opacity = 0
+        this.add(introBg)
 
         let introAlpha = 0
 
@@ -46,6 +45,7 @@ export class Ironvale extends Scene {
                 introBg.graphics.opacity = introAlpha
             }
         })
+
         this.add(fadeInTimer)
         fadeInTimer.start()
 
@@ -59,6 +59,7 @@ export class Ironvale extends Scene {
                 size: 70
             })
         })
+
         this.add(title)
 
         const subtitle = new Label({
@@ -71,6 +72,7 @@ export class Ironvale extends Scene {
                 size: 35
             })
         })
+
         this.add(subtitle)
 
         const fullTitle = "IRONVALE"
@@ -107,10 +109,13 @@ export class Ironvale extends Scene {
                 }
             }
         })
+
         this.add(introTimer)
         introTimer.start()
 
         const startLevel = () => {
+            this.add(new HUD())
+
             // Objective
             this.objective = new Label({
                 text: "Haal informatie op bij arbeiders (0/3)",
@@ -122,18 +127,19 @@ export class Ironvale extends Scene {
                     size: 24
                 })
             })
+
             this.objective.z = 100
             this.add(this.objective)
 
-            // Moving Background
+            // Background
             const ironvaleBg = new Actor({
                 x: 0,
-                y: 0,
+                y: 0
             })
+
             ironvaleBg.z = -10
             ironvaleBg.anchor = new Vector(0, 0)
             ironvaleBg.graphics.use(Resources.BgIronvale.toSprite())
-
             this.add(ironvaleBg)
 
             // Level Borders
@@ -144,6 +150,7 @@ export class Ironvale extends Scene {
                 height: 720,
                 collisionType: CollisionType.Fixed
             })
+
             this.add(leftBorder)
 
             const rightBorder = new Actor({
@@ -152,8 +159,20 @@ export class Ironvale extends Scene {
                 width: 40,
                 height: 720,
                 collisionType: CollisionType.Fixed
-            });
-            this.add(rightBorder);
+            })
+
+            this.add(rightBorder)
+
+            // Player
+            const player = new Player()
+            player.pos = new Vector(0, 430)
+            player.previousBottom = player.pos.y
+            player.name = "player"
+            player.onKnockoutComplete = () => {
+                this.engine.lastScene = "ironvale";
+                this.engine.goToScene("gameover")
+            }
+            this.add(player)
 
             // Platform Opstelling
             this.add(new ironvalePlatform(0, 440, 240, 20))
@@ -162,7 +181,7 @@ export class Ironvale extends Scene {
 
             this.add(new ironvalePlatform(270, 440, 160, 20))
 
-            this.add(new ironvalePlatform(400, 530, 130, 20))
+            this.createOneWayPlatform(400, 530, 130, 20, player)
 
             this.add(new ironvalePlatform(580, 400, 230, 20))
 
@@ -194,7 +213,6 @@ export class Ironvale extends Scene {
 
             this.add(new ironvalePlatform(1390, 240, 70, 20))
 
-
             // Spikes
             const addSpikeRow = (startX, y, amount) => {
                 for (let i = 0; i < amount; i++) {
@@ -210,15 +228,7 @@ export class Ironvale extends Scene {
             addSpikeRow(1250, 650, 7)
             addSpikeRow(1500, 470, 5)
 
-            // Player
-            const player = new Player()
-            player.pos = new Vector(0, 430)
-            player.name = "player"
-            player.onKnockoutComplete = () => this.restartLevel()
-            this.add(player)
-
             // Workers
-            // 1
             const worker1 = new WorkerNpc(
                 870,
                 310,
@@ -251,6 +261,7 @@ export class Ironvale extends Scene {
 
             // Camera
             this.camera.strategy.lockToActorAxis(player, Axis.X)
+
             this.camera.strategy.limitCameraBounds(new BoundingBox({
                 left: 0,
                 top: 0,
@@ -258,6 +269,7 @@ export class Ironvale extends Scene {
                 bottom: 720
             }))
 
+            // Exit Trigger
             const exitTrigger = new Actor({
                 x: 2140,
                 y: 360,
@@ -265,10 +277,10 @@ export class Ironvale extends Scene {
                 height: 720,
                 collisionType: CollisionType.Passive
             })
+
             this.add(exitTrigger)
 
             exitTrigger.on("collisionstart", (event) => {
-
                 if (
                     event.other.owner?.name === "player" &&
                     this.canLeave
@@ -281,31 +293,40 @@ export class Ironvale extends Scene {
 
     onPreUpdate() {
         if (this.objective) {
-            this.objective.pos.x = Math.round(this.camera.pos.x - 600)
+            this.objective.pos.x = Math.round(this.camera.pos.x + 180)
             this.objective.pos.y = Math.round(this.camera.pos.y - 320)
         }
     }
 
     workerTalkedTo() {
         this.workersSpoken++
+
         this.objective.text =
             `Haal informatie op bij arbeiders (${this.workersSpoken}/3)`
 
         if (this.workersSpoken >= 3) {
             this.canLeave = true
+
             this.objective.text =
                 "Alle informatie verzameld, ga de fabriek binnen."
         }
     }
 
     restartLevel() {
-
         this.workersSpoken = 0
         this.canLeave = false
+        this.objective = null
 
         this.clear()
         this.camera.clearAllStrategies()
 
         this.onInitialize(this.engine)
+    }
+
+    createOneWayPlatform(x, y, width, height, player) {
+        const platform = new OneWayPlatform(x, y, width, height)
+
+        this.add(platform)
+        player.addOneWayPlatform(platform)
     }
 }

@@ -226,7 +226,7 @@ export class Southreach extends Scene {
         exitTrigger.on("collisionstart", (evt) => {
             if (this.isPlayerCollision(evt, player)) {
                 this.isAtExit = true
-                this.exitLabel.text = "press x to go to the next level"
+                this.exitLabel.text = "press E to go to the next level"
             }
         })
 
@@ -287,8 +287,11 @@ export class Southreach extends Scene {
         trader.setBuyFoodCallback(() => this.buyFoodFromTrader())
         this.add(trader)
 
-        this.add(new Drone(800, 600, 100, 250))
-        this.add(new Drone(1400, 400, 160, 350))
+        this.add(new Drone(420, 600, 70, 330))
+        this.add(new Drone(420, 470, 75, 300))
+        this.add(new Drone(800, 600, 90, 280))
+        this.add(new Drone(800, 455, 110, 260))
+        this.add(new Drone(1400, 400, 100, 380))
 
         this.createObjectivesLabel()
 
@@ -466,7 +469,10 @@ export class Southreach extends Scene {
         this.watchTowerCone.pos = new Vector(this.watchTowerOrigin.x, this.watchTowerOrigin.y)
         this.watchTowerCone.rotation = this.watchConeAngle
 
-        this.playerSeenByTower = this.isAtPoliceMoney && this.isPlayerInsideWatchCone()
+        this.playerSeenByTower =
+            this.isAtPoliceMoney &&
+            this.isPlayerInsideWatchCone() &&
+            this.engine.input.keyboard.isHeld(Keys.X)
 
         if (this.playerSeenByTower) {
             this.watchTowerCone.graphics.use("alert")
@@ -567,7 +573,7 @@ export class Southreach extends Scene {
         this.player.money += 1
 
         if (this.moneyStolen >= this.totalMoney && !this.hasReducedPeaceForStealing) {
-            GameState.peace = Math.max(0, (GameState.peace ?? 0) - 10)
+            GameState.peace = Math.max(0, (GameState.peace ?? 0) - 2)
             this.hasReducedPeaceForStealing = true
         }
 
@@ -606,7 +612,7 @@ export class Southreach extends Scene {
         this.player.food -= 1
         this.foodGiven += 1
 
-        GameState.support = Math.min(100, (GameState.support ?? 0) + 5)
+        GameState.support = Math.min(100, (GameState.support ?? 0) + 8)
 
         this.updateObjectivesText()
 
