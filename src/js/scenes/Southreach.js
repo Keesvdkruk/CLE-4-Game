@@ -289,7 +289,7 @@ export class Southreach extends Scene {
 
         this.add(new Drone(420, 600, 70, 330))
         this.add(new Drone(420, 470, 75, 300))
-        this.add(new Drone(800, 600, 90, 280))
+        this.add(new Drone(800, 600, 60, 280))
         this.add(new Drone(800, 455, 110, 260))
         this.add(new Drone(1400, 400, 100, 380))
 
