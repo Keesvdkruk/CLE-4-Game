@@ -343,7 +343,7 @@ export class RoadToSquare extends Scene {
                 this.camera.pos.x = levelWidth - engine.drawWidth / 2;
             }
 
-            objective.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            objective.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 140;
             objective.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 40;
 
             if (!levelCompleted && !playerHit) {
@@ -351,10 +351,10 @@ export class RoadToSquare extends Scene {
                 scoreText.text = "Time: " + currentTime.toFixed(2);
             }
 
-            scoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
-            scoreText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 70;
+            scoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 940;
+            scoreText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 160;
 
-            highScoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40;
+            highScoreText.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 940;
             highScoreText.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 100;
 
             retryText.pos.x = this.camera.pos.x + engine.drawWidth / 2 - 360;
