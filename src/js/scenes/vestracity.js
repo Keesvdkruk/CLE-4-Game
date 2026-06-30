@@ -2,9 +2,13 @@ import { Scene, Label, Font, Color, Actor, Timer, CollisionType, Vector, Keys } 
 import { Resources } from "../resources.js";
 import { Player } from "../player.js";
 import { HUD } from "../HUD.js";
+import { GameState } from "../state.js";
+import { MenuButton } from "./MenuButton.js";
+import { VestraCityInside } from "./vestracityinside.js";
 
 export class VestraCity extends Scene {
     onInitialize(engine) {
+      GameState.enterLevel("vestracity");
         this.backgroundColor = Color.Black;
 
         const introBg = new Actor({
@@ -40,6 +44,9 @@ export class VestraCity extends Scene {
 
         const hud = new HUD();
         this.add(hud);
+
+        const menuButton = new MenuButton();
+        this.add(menuButton);
 
         const year = new Label({
             text: "",
@@ -350,6 +357,9 @@ export class VestraCity extends Scene {
             });
             this.on("preupdate", () => {
                 if (nearDoor && hasKeycard && engine.input.keyboard.wasPressed(Keys.E)) {
+                    GameState.unlockLevel("vestracityinside");
+                    GameState.saveCheckpoint();
+
                     engine.goToScene("vestracityinside");
                     console.log("E ingedrukt");
                 }

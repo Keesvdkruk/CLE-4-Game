@@ -16,6 +16,7 @@ import { PeacefulRoadToSquare } from './scenes/peacefulroadtosquare.js'
 import { Square } from './scenes/square.js'
 import { ViolenceSquare } from './scenes/violencesquare.js'
 import { GameState } from "./state.js";
+import { MenuScene } from "./scenes/menuscene.js";
 
 export class Game extends Engine {
     constructor() {
@@ -51,9 +52,11 @@ export class Game extends Engine {
         this.addScene("peacefulroadtosquare", new PeacefulRoadToSquare())
         this.addScene("square", new Square())
         this.addScene("violencesquare", new ViolenceSquare())
+        this.addScene("menu", new MenuScene());
+        
 
-        this.lastScene = "start";
-        this.goToScene("start");
+        this.lastScene = "start"
+        this.goToScene("start")
     }
 }
 

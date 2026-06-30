@@ -5,9 +5,12 @@ import { RoadToSquare } from "./roadtosquare.js";
 import { Npc_1 } from "../npc_1.js";
 import { Npc_2 } from "../npc_2.js";
 import { HUD } from "../HUD.js";
+import { MenuButton } from "./MenuButton.js";
+import { GameState } from "../state.js";
 
 export class ViolenceSquare extends Scene {
     onInitialize(engine) {
+        GameState.currentScene = "peacefulroadtosquare";
         this.backgroundColor = Color.Black;
 
         const bg = new Actor({
@@ -30,7 +33,10 @@ export class ViolenceSquare extends Scene {
         this.add(ground);
 
         const hud = new HUD();
-        this.add(hud);
+               this.add(hud);
+       
+               const menuButton = new MenuButton();
+               this.add(menuButton);
 
         const leftBorder = new Actor({
             x: -25,
