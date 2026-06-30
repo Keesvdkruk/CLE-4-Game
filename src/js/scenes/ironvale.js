@@ -9,6 +9,9 @@ import { WorkerNpc } from "../worker"
 import { IronvaleDrone } from "../ironvaleDrone"
 import { MovingPlatform } from "../movingPlatform"
 import { Spike } from "../spike"
+import { GameState } from "../state"
+import { HUD } from "../HUD"
+
 
 export class Ironvale extends Scene {
 
@@ -214,7 +217,10 @@ export class Ironvale extends Scene {
             const player = new Player()
             player.pos = new Vector(0, 430)
             player.name = "player"
-            player.onKnockoutComplete = () => this.restartLevel()
+            player.onKnockoutComplete = () => {
+                this.engine.lastScene = "ironvale";
+                this.engine.goToScene("gameover");
+            }
             this.add(player)
 
             // Workers

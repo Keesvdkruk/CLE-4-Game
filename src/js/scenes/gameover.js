@@ -3,6 +3,7 @@ import { Resources } from "../resources.js"
 import { RoadToSquare } from "./roadtosquare.js"
 import { VestraCity } from "./vestracity.js"
 import { Southreach } from "./southreach.js"
+import { Ironvale } from "./ironvale.js"
 
 export class GameOver extends Scene {
 

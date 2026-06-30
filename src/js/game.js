@@ -52,7 +52,6 @@ export class Game extends Engine {
         this.addScene("peacefulroadtosquare", new PeacefulRoadToSquare())
         this.addScene("square", new Square())
         this.addScene("violencesquare", new ViolenceSquare())
-        this.addScene("menu", new MenuScene());
         
 
         this.lastScene = "start"
