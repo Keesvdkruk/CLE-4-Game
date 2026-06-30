@@ -3,7 +3,7 @@ import { Player } from "./player.js"
 import { Resources } from "./resources.js"
 
 export class Drone extends Actor {
-    constructor(x, y) {
+    constructor(x, y, snelheid = 100, bereik = 250) {
         super({
             x: x,
             y: y,
@@ -12,6 +12,9 @@ export class Drone extends Actor {
             color: Color.Red,
             collisionType: CollisionType.Passive 
         })
+
+        this.snelheid = snelheid
+        this.bereik = bereik
     }
 
     onInitialize(engine) {
@@ -21,19 +24,26 @@ export class Drone extends Actor {
         })
 
         const walkAnim = Animation.fromSpriteSheet(walkSheet, [0, 1, 2, 3], 80)
+
         this.graphics.add("walk", walkAnim)
         this.graphics.use("walk")
 
         this.actions.repeatForever(ctx => {
-            ctx.moveBy(250, 0, 100)   
-               .moveBy(-250, 0, 100)  
+            ctx.moveBy(this.bereik, 0, this.snelheid)
+               .moveBy(-this.bereik, 0, this.snelheid)
         })
 
-        this.on('collisionstart', (evt) => {
-            if (evt.other.owner instanceof Player) {
+        this.on("collisionstart", (evt) => {
+            const hitPlayer =
+                evt.other instanceof Player
+                    ? evt.other
+                    : evt.other?.owner instanceof Player
+                        ? evt.other.owner
+                        : null
+
+            if (hitPlayer) {
                 console.log("BETRAPT! Terug naar de start.")
-                
-                evt.other.owner.startKnockout()
+                hitPlayer.startKnockout()
             }
         })
     }
