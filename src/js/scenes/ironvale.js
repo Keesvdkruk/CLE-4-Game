@@ -230,7 +230,6 @@ export class Ironvale extends Scene {
             addSpikeRow(1500, 470, 5)
 
             // Player
-            const player = new Player()
             player.pos = new Vector(0, 430)
             player.name = "player"
             player.onKnockoutComplete = () => {

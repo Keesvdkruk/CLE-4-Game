@@ -314,7 +314,7 @@ export class Southreach extends Scene {
             return
         }
 
-        if (this.isAtExit && engine.input.keyboard.wasPressed(Keys.X)) {
+        if (this.isAtExit && engine.input.keyboard.wasPressed(Keys.E)) {
             engine.goToScene("ironvale")
         }
 
