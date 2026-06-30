@@ -180,7 +180,7 @@ export class Prisoner extends Actor {
             text: "Hold X to free",
             color: Color.White,
             font: new Font({
-                family: "Upheaval",
+                family: "MijnPixelFont",
                 size: 14,
                 unit: FontUnit.Px
             })

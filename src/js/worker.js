@@ -20,8 +20,8 @@ export class WorkerNpc extends Actor {
         super({
             x,
             y,
-            width: 130,
-            height: 130,
+            width: 60,
+            height: 82,
             collisionType: CollisionType.Passive,
             anchor: new Vector(0.5, 1)
         })
@@ -51,23 +51,9 @@ export class WorkerNpc extends Actor {
     onInitialize(engine) {
         this.engine = engine
 
-        const workerSheet = SpriteSheet.fromImageSource({
-            image: Resources.Worker,
-            grid: {
-                rows: 1,
-                columns: 4,
-                spriteWidth: 130,
-                spriteHeight: 130
-            }
-        })
-
-        const idleAnimation = Animation.fromSpriteSheet(
-            workerSheet,
-            range(0, 3),
-            190
+        this.graphics.use(
+            Resources.Worker.toSprite()
         )
-
-        this.graphics.use(idleAnimation)
 
         this.on("collisionstart", (evt) => {
 
@@ -136,7 +122,7 @@ export class WorkerNpc extends Actor {
             text: "",
             color: Color.White,
             font: new Font({
-                family: "Upheaval",
+                family: "MijnPixelFont",
                 size: 16,
                 unit: FontUnit.Px
             })
@@ -194,7 +180,7 @@ export class WorkerNpc extends Actor {
             text: "Press E to talk",
             color: Color.White,
             font: new Font({
-                family: "Upheaval",
+                family: "MijnPixelFont",
                 size: 14,
                 unit: FontUnit.Px
             })
