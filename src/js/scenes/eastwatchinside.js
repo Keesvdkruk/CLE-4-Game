@@ -145,9 +145,17 @@ export class EastwatchInside extends Scene {
         this.add(new Drone(850, 380))
         this.add(new Drone(1100, 310))
 
+        const guard = new Actor({
+            x: 700, y: 335,
+            width: 30, height: 50,
+            color: Color.fromHex("#e53e3e"),
+            collisionType: CollisionType.Fixed
+        })
+        this.add(guard)
+
         const visionHitbox = new Actor({
-            x: 700, y: 360,
-            width: 350, height: 80,
+            x: 900, y: 335,
+            width: 350, height: 60,
             collisionType: CollisionType.Passive,
             color: Color.Red
         })
@@ -160,7 +168,8 @@ export class EastwatchInside extends Scene {
             repeats: true,
             fcn: () => {
                 lookingLeft = !lookingLeft
-                visionHitbox.pos.x = lookingLeft ? 450 : 700
+                guard.pos.x = lookingLeft ? 550 : 700
+                visionHitbox.pos.x = lookingLeft ? 350 : 900
             }
         })
         this.add(guardTimer)

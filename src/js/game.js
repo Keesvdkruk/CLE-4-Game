@@ -43,6 +43,7 @@ export class Game extends Engine {
         this.addScene("ironvale", new Ironvale())
         this.addScene("ironvalefactory", new IronvaleFactory())
         this.addScene("eastwatch", new Eastwatch())
+        this.addScene("eastwatchinside", new EastwatchInside())
         this.addScene("vestracity", new VestraCity())
         this.addScene("gameover", new GameOver())
         this.addScene("vestracityinside", new VestraCityInside())

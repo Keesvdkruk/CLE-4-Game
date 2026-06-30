@@ -14,6 +14,16 @@ export class Eastwatch extends Scene {
         bg.graphics.use(Resources.EastwatchOutside.toSprite())
         this.add(bg)
 
+        const ground = new Actor({
+            x: 2000,
+            y: 730,
+            width: 4000,
+            height: 60,
+            color: Color.fromHex("#1a1a2e00"),
+            collisionType: CollisionType.Fixed
+        })
+        this.add(ground)
+
         const objective = new Label({
             text: "Objective: sluip de militaire basis binnen.",
             x: 40,
@@ -23,8 +33,7 @@ export class Eastwatch extends Scene {
         })
         this.add(objective)
 
-        const ground = new Ground()
-        this.add(ground)
+        
 
         // linker muur
         const leftWall = new Actor({

@@ -50,6 +50,7 @@ export const Resources = {
     //Efe:
     EastwatchOutside: new ImageSource('/eastwatch/eastwatchoutside.png'),
     EastwatchInside: new ImageSource('/eastwatch/eastwatchinside.png'),
+    Guard: new ImageSource('/eastwatch/guard.png'),
 
     // Objects
     Platform: new ImageSource('/images/Platform.png'),
