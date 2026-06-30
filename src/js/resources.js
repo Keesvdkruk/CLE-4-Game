@@ -87,6 +87,7 @@ export const Resources = {
     President: new ImageSource("./images/President.png"),
    President_kneel: new ImageSource("./images/President_kneel.png"),
    EndScreen: new ImageSource("./images/Endscreen.png"),
+   ViolentEndScreen: new ImageSource("./images/ViolentEndscreen.png"),
    StartScreen: new ImageSource("./images/StartScreen.png"),
    Gunshot: new Sound("./Sounds/Gunshot.wav"),
 

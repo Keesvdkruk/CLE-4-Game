@@ -158,7 +158,7 @@ export class Eastwatch extends Scene {
 
         this.on("preupdate", () => {
             if (nearDoor && engine.input.keyboard.wasPressed(Keys.E)) {
-                engine.goToScene("vestracity")
+                engine.goToScene("eastwatchinside")
             }
 
             // label vastzetten op scherm
