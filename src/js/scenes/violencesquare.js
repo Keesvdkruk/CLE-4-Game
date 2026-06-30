@@ -176,7 +176,7 @@ export class ViolenceSquare extends Scene {
                 y: engine.drawHeight / 2
             });
 
-            const endSprite = Resources.EndScreen.toSprite();
+            const endSprite = Resources.ViolentEndScreen.toSprite();
             endBg.graphics.use(endSprite);
             endBg.scale.setTo(
                 engine.drawWidth / endSprite.width,
