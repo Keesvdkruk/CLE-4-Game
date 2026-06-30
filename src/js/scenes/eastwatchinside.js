@@ -1,4 +1,4 @@
-import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, Vector, Timer, Keys, Label, Font } from "excalibur"
+import { Actor, Color, CollisionType, Axis, BoundingBox, Scene, Vector, Timer, Keys, Label, Font, Polygon, Shape } from "excalibur"
 import { Drone } from "../drone"
 import { Player } from "../player"
 import { Resources } from "../resources"
@@ -148,28 +148,58 @@ export class EastwatchInside extends Scene {
         const guard = new Actor({
             x: 700, y: 335,
             width: 30, height: 50,
-            color: Color.fromHex("#e53e3e"),
             collisionType: CollisionType.Fixed
         })
+        guard.graphics.use(Resources.Guard.toSprite())
+        guard.scale = new Vector(0.1, 0.1)
         this.add(guard)
+
+        // --- Driehoekige vision hitbox (1 punt richting de guard) ---
+        const visionWidth = 350
+        const visionHeight = 60
+
+        const trianglePoints = [
+            new Vector(-visionWidth / 2, 0),
+            new Vector(visionWidth / 2, -visionHeight / 2),
+            new Vector(visionWidth / 2, visionHeight / 2)
+        ]
 
         const visionHitbox = new Actor({
             x: 900, y: 335,
-            width: 350, height: 60,
             collisionType: CollisionType.Passive,
-            color: Color.Red
+            collider: Shape.Polygon(trianglePoints)
         })
-        visionHitbox.graphics.opacity = 0
+
+        const visionGraphic = new Polygon({
+            points: trianglePoints,
+            color: Color.Yellow
+        })
+        visionHitbox.graphics.use(visionGraphic)
+        visionHitbox.graphics.opacity = 0.3
         this.add(visionHitbox)
 
         let lookingLeft = false
+
+        function updateVisionSide() {
+            if (lookingLeft) {
+                visionHitbox.pos.x = guard.pos.x - 175 - 15
+                visionHitbox.graphics.flipHorizontal = true
+                guard.graphics.flipHorizontal = true
+            } else {
+                visionHitbox.pos.x = guard.pos.x + 175 + 15
+                visionHitbox.graphics.flipHorizontal = false
+                guard.graphics.flipHorizontal = false
+            }
+        }
+
+        updateVisionSide()
+
         const guardTimer = new Timer({
             interval: 3000,
             repeats: true,
             fcn: () => {
                 lookingLeft = !lookingLeft
-                guard.pos.x = lookingLeft ? 550 : 700
-                visionHitbox.pos.x = lookingLeft ? 350 : 900
+                updateVisionSide()
             }
         })
         this.add(guardTimer)
@@ -187,6 +217,7 @@ export class EastwatchInside extends Scene {
             y: 40,
             collisionType: CollisionType.PreventCollision
         })
+
         const objectiveLabel = new Label({
             text: "Objective: vind de serverruimte en steel de data.",
             x: 0,
@@ -197,8 +228,9 @@ export class EastwatchInside extends Scene {
         this.add(objective)
         objective.addChild(objectiveLabel)
 
+        let dataStolen = false
+
         this.on("preupdate", () => {
-            // Zet de actor op de linkerbovenhoek van de huidige camera-viewport
             objective.pos.x = this.camera.pos.x - engine.drawWidth / 2 + 40
             objective.pos.y = this.camera.pos.y - engine.drawHeight / 2 + 40
 
@@ -208,44 +240,23 @@ export class EastwatchInside extends Scene {
             }
         })
 
-        let caught = false
-        let dataStolen = false
-
         this.on("activate", () => {
-            caught = false
             dataStolen = false
         })
 
-        visionHitbox.on("collisionstart", (event) => {
-            if (event.other.owner?.name === "player" && !caught && !dataStolen) {
-                caught = true
-                player.vel.x = 0
-                player.vel.y = 0
+        visionHitbox.on("collisionstart", (evt) => {
+            if (dataStolen) return
 
-                const fade = new Actor({
-                    x: engine.drawWidth / 2,
-                    y: engine.drawHeight / 2,
-                    width: engine.drawWidth,
-                    height: engine.drawHeight,
-                    color: Color.Black
-                })
-                fade.graphics.opacity = 0
-                this.add(fade)
+            const hitPlayer =
+                evt.other instanceof Player
+                    ? evt.other
+                    : evt.other?.owner instanceof Player
+                        ? evt.other.owner
+                        : null
 
-                const fadeTimer = new Timer({
-                    interval: 40,
-                    repeats: true,
-                    fcn: () => {
-                        fade.graphics.opacity += 0.05
-                        if (fade.graphics.opacity >= 1) {
-                            fadeTimer.cancel()
-                            engine.lastScene = "eastwatchinside"
-                            engine.goToScene("vestracity.js")
-                        }
-                    }
-                })
-                this.add(fadeTimer)
-                fadeTimer.start()
+            if (hitPlayer) {
+                console.log("BETRAPT door de guard! Terug naar de start.")
+                hitPlayer.startKnockout()
             }
         })
 
